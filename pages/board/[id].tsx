@@ -4,21 +4,25 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery, useQueryClient } from "react-query";
-import { BASE_PATH, POST_PATH } from "../../apiCall/base";
+import { BASE_PATH, COMMENT_PATH, POST_PATH } from "../../apiCall/base";
 import { fetchPost } from "../../apiCall/post";
 
-export default function Post({
-  postId
-}: {
-  postId:string
-}) {
+export default function Post({ postId }: { postId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [edit, setEdit] = useState(false);
-  const { register, handleSubmit, getValues } = useForm();
-  const { isLoading, isError, data:post, error } = useQuery(
-    "post",
-    () => fetchPost(postId)
+  const {
+    register: pRegister,
+    handleSubmit: pHandleSubmit,
+    getValues: pGetValues,
+  } = useForm();
+  const {
+    register: cRegister,
+    handleSubmit: cHandleSubmit,
+    getValues: cGetValues,
+  } = useForm();
+  const { isLoading, isError, isSuccess, data, error } = useQuery("post", () =>
+    fetchPost(postId)
   );
 
   const toBoardHome = () => {
@@ -26,16 +30,15 @@ export default function Post({
   };
 
   const callPostEditAPI = () => {
-    const data = getValues();
+    const formData = pGetValues();
     axios
-      .put(`${BASE_PATH}/${POST_PATH}/${postId}`, data)
+      .put(`${BASE_PATH}/${POST_PATH}/${postId}`, formData)
       .then((res) => {
         if (res) {
           console.log(res);
         }
         queryClient.invalidateQueries();
         setEdit(false);
-        data.title = data.title;
       })
       .catch((error) => console.log(error));
   };
@@ -48,6 +51,32 @@ export default function Post({
           console.log(res);
         }
         router.push("/board");
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const callCommentSaveAPI = (postId) => {
+    const formData = cGetValues();
+    console.log(formData);
+    axios
+      .post(`${BASE_PATH}/${COMMENT_PATH}/post/${postId}`, formData)
+      .then((res) => {
+        if (res) {
+          console.log(res);
+        }
+        queryClient.invalidateQueries();
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const callCommentDeleteAPI = (commentId: String) => {
+    axios
+      .delete(`${BASE_PATH}/${COMMENT_PATH}/${commentId}`)
+      .then((res) => {
+        if (res) {
+          console.log(res);
+        }
+        queryClient.invalidateQueries();
       })
       .catch((error) => console.log(error));
   };
@@ -65,19 +94,19 @@ export default function Post({
       <div>
         {edit ? (
           <div>
-            <form onSubmit={handleSubmit(callPostEditAPI)}>
-              <label htmlFor="title">제목</label>
+            <form onSubmit={pHandleSubmit(callPostEditAPI)}>
+              <label htmlFor="post-title">제목</label>
               <input
-                id="title"
-                className="border-2 border-"
-                {...register("title", { required: true })}
+                id="post-title"
+                className="border-2"
+                {...pRegister("title", { required: true })}
               />
               <br />
-              <label htmlFor="content">내용</label>
+              <label htmlFor="post-content">내용</label>
               <input
-                id="content"
+                id="post-content"
                 className="border-2"
-                {...register("content", { required: true })}
+                {...pRegister("content", { required: true })}
               />
               <hr />
               <div className="my-2">
@@ -96,26 +125,26 @@ export default function Post({
         ) : (
           <>
             <div className="header">
-              <h2 className="text-4xl">{post.title}</h2>
-              <span>{post.username}</span>
+              <h2 className="text-4xl">{data.post.title}</h2>
+              <span>{data.post.username}</span>
               <div className="float-end">
                 <button
                   type="button"
-                  className="btn btn-secondary btn-sm"
+                  className="border-2 w-20 h-10"
                   onClick={toBoardHome}
                 >
                   목록
                 </button>
                 <button
                   type="button"
-                  className="btn btn-primary btn-sm"
+                  className="border-2 w-20 h-10"
                   onClick={() => setEdit(true)}
                 >
                   수정
                 </button>
                 <button
                   type="button"
-                  className="btn btn-danger btn-sm"
+                  className="border-2 w-20 h-10"
                   id="postDeleteBtn"
                   onClick={callPostDeleteAPI}
                 >
@@ -124,7 +153,38 @@ export default function Post({
               </div>
             </div>
             <div className="w-100 mt-2">
-              <div>{post.content}</div>
+              <div>{data.post.content}</div>
+            </div>
+            <hr />
+            <div className="mt-2 p-2">
+              {data.commentList.map((comment) => (
+                <div key={comment.id}>
+                  <div>
+                    <span>{comment.content} </span>
+                    <span>{comment.username} </span>
+                    <button
+                      onClick={() => callCommentDeleteAPI(comment.id + "")}
+                      className="border rounded w-20 h-10 text-blue"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <hr />
+              <div>
+                <form onSubmit={cHandleSubmit(() => callCommentSaveAPI(postId))}>
+                  <label htmlFor="comment-content"></label>
+                  <input
+                    id="comment-content"
+                    className="border-2"
+                    {...cRegister("content", { required: true })}
+                  />
+                  <button className="border-0 rounded w-20 h-10 bg-black hover:bg-red-400 text-white">
+                    작성
+                  </button>
+                </form>
+              </div>
             </div>
           </>
         )}

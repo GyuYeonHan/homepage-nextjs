@@ -16,34 +16,18 @@ export default function Board() {
   );
   const queryClient = useQueryClient();
 
-  const callPostSaveAPI = (data) => {
+  const callPostSaveAPI = () => {
+    const formData = getValues();
     axios
-      .post(`${BASE_PATH}/${POST_PATH}`, data)
+      .post(`${BASE_PATH}/${POST_PATH}`, formData)
       .then((res) => {
         if (res) {
           console.log(res);
         }
-        toggleWrite();
+        setWrite(false);
         queryClient.invalidateQueries();
       })
       .catch((error) => console.log(error));
-  };
-
-  const onValid = () => {
-    const data = getValues();
-    callPostSaveAPI(data);
-  };
-
-  // if (isLoading) {
-  //   return <span>Loading...</span>;
-  // }
-
-  // if (isError) {
-  //   return <span>Error: {error.message}</span>;
-  // }
-
-  const toggleWrite = () => {
-    setWrite((prev) => !prev);
   };
 
   const getSession = () => {
@@ -56,6 +40,14 @@ export default function Board() {
       })
       .catch();
   };
+
+  if (isLoading) {
+    return <span>Loading...</span>;
+  }
+
+  if (isError) {
+    return <span>Error: {error.message}</span>;
+  }
 
   return (
     <>
@@ -70,7 +62,7 @@ export default function Board() {
         <button onClick={getSession}>세션확인</button>
         {write ? (
           <div>
-            <form onSubmit={handleSubmit(onValid)}>
+            <form onSubmit={handleSubmit(callPostSaveAPI)}>
               <label htmlFor="title">제목</label>
               <input
                 id="title"
@@ -90,7 +82,7 @@ export default function Board() {
                   작성
                 </button>
                 <button
-                  onClick={toggleWrite}
+                  onClick={() => setWrite(false)}
                   className="border-0 rounded w-20 h-10 bg-black hover:bg-red-400 text-white"
                 >
                   취소
@@ -100,7 +92,7 @@ export default function Board() {
           </div>
         ) : (
           <>
-            <button onClick={toggleWrite}>글쓰기</button>
+            <button onClick={() => setWrite(true)}>글쓰기</button>
             <table className="table table-hover">
               <thead className="thead-strong">
                 <tr>

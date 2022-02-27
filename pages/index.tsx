@@ -31,7 +31,7 @@ export default function Home() {
       .catch((error) => console.log(error));
   };
 
-  useEffect(getSession, []);
+  useEffect(getSession, [username]);
 
   return (
     <>

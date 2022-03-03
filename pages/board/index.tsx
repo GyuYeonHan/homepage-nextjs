@@ -16,6 +16,8 @@ export default function Board() {
   );
   const queryClient = useQueryClient();
 
+  axios.defaults.withCredentials = true;
+
   const callPostSaveAPI = () => {
     const formData = getValues();
     axios
@@ -52,7 +54,6 @@ export default function Board() {
   return (
     <>
       <div>
-        게시글 목록
         <Link href="/">
           <a className="text-4xl">
             <br />

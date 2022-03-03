@@ -29,6 +29,8 @@ export default function Post({ postId }: { postId: string }) {
     router.push(`/board`);
   };
 
+  axios.defaults.withCredentials = true;
+
   const callPostEditAPI = () => {
     const formData = pGetValues();
     axios

@@ -47,10 +47,6 @@ export default function Board() {
     return <span>Loading...</span>;
   }
 
-  if (isError) {
-    return <span>Error: {error.message}</span>;
-  }
-
   return (
     <>
       <div>

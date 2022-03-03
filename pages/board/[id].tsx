@@ -87,10 +87,6 @@ export default function Post({ postId }: { postId: string }) {
     return <span>Loading...</span>;
   }
 
-  if (isError) {
-    return <span>Error: {error.message}</span>;
-  }
-
   return (
     <div>
       <div>

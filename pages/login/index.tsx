@@ -1,10 +1,9 @@
 import axios from "axios";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { BASE_PATH } from "../../apiCall/base";
 
-export default function login() {
+export default function Login() {
   const router = useRouter();
   const { register, handleSubmit, getValues } = useForm();
 
@@ -27,10 +26,6 @@ export default function login() {
   const toHome = () => {
     router.push(`/`);
   };
-
-  // useEffect(() => {
-
-  // },[]);
 
   return (
     <div className="flex flex-col">

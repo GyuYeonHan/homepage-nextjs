@@ -5,5 +5,5 @@ export function fetchAllPostList() {
 }
 
 export function fetchCommentLisyByPost(postId: string) {
-  return fetch(`${BASE_PATH}/${COMMENT_PATH}/${id}`).then((res) => res.json());
+  return fetch(`${BASE_PATH}/${COMMENT_PATH}/${postId}`).then((res) => res.json());
 }

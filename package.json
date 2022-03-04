@@ -6,7 +6,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "next build"
+    "deploy": "next build && next export"
   },
   "dependencies": {
     "@netlify/plugin-nextjs": "^4.2.7",

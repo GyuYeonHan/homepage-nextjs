@@ -37,13 +37,8 @@ export default function Board() {
 
   return (
     <>
-      <div>
-        <Link href="/">
-          <a className="text-4xl">
-            <br />
-            <span>홈</span>
-          </a>
-        </Link>
+      <div className="container">
+        <h2 className="text-4xl">게시판</h2>
         {write ? (
           <div>
             <form onSubmit={handleSubmit(callPostSaveAPI)}>
@@ -67,7 +62,7 @@ export default function Board() {
                 </button>
                 <button
                   onClick={() => setWrite(false)}
-                  className="border-0 rounded w-20 h-10 bg-black hover:bg-red-400 text-white"
+                  className="border-2 rounded w-20 h-10 bg-white hover:bg-white/70 text-black"
                 >
                   취소
                 </button>
@@ -76,9 +71,14 @@ export default function Board() {
           </div>
         ) : (
           <>
-            <button onClick={() => setWrite(true)}>글쓰기</button>
-            <table className="table table-hover">
-              <thead className="thead-strong">
+            <button
+              className="border-0 rounded w-24 h-8 bg-lime-600/80 hover:bg-lime-600 text-white"
+              onClick={() => setWrite(true)}
+            >
+              새 글 쓰기
+            </button>
+            <table className="table-auto border-2">
+              <thead className="table-header-group border-2">
                 <tr>
                   <th>게시글번호</th>
                   <th>제목</th>
@@ -86,17 +86,17 @@ export default function Board() {
                   <th>최종 수정일</th>
                 </tr>
               </thead>
-              <tbody id="tbody">
+              <tbody className="table-row-group">
                 {data?.map((post) => (
-                  <tr key={post.id}>
-                    <td>{post.id}</td>
-                    <td>
+                  <tr key={post.id} className="table-row hover:opacity-50">
+                    <td className="table-cell">{post.id}</td>
+                    <td className="table-cell">
                       <Link href={`/board/${post.id}`}>
                         <a>{post.title}</a>
                       </Link>
                     </td>
-                    <td>{post.username}</td>
-                    <td>{post.modifiedDate}</td>
+                    <td className="table-cell">{post.username}</td>
+                    <td className="table-cell">{post.modifiedDate}</td>
                   </tr>
                 ))}
               </tbody>

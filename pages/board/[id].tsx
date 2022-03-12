@@ -96,16 +96,20 @@ export default function Post({ postId }: { postId: string }) {
           <div>
             <form onSubmit={pHandleSubmit(callPostEditAPI)}>
               <label htmlFor="post-title">제목</label>
+              <br />
               <input
                 id="post-title"
                 className="border-2"
+                value={data.post.title}
                 {...pRegister("title", { required: true })}
               />
               <br />
               <label htmlFor="post-content">내용</label>
-              <input
+              <br />
+              <textarea
                 id="post-content"
                 className="border-2"
+                value={data.post.content}
                 {...pRegister("content", { required: true })}
               />
               <hr />
@@ -127,30 +131,30 @@ export default function Post({ postId }: { postId: string }) {
             <div className="header">
               <h2 className="text-4xl inline-block">{data.post.title}</h2>
               <span className="ml-1">{data.post.username}</span>
-              <div className="float-end">
-                <button
-                  type="button"
-                  className="border-2 w-12 h-7"
-                  onClick={toBoardHome}
-                >
-                  목록
-                </button>
-                <button
-                  type="button"
-                  className="border-2 w-12 h-7"
-                  onClick={() => setEdit(true)}
-                >
-                  수정
-                </button>
-                <button
-                  type="button"
-                  className="border-2 w-12 h-7"
-                  id="postDeleteBtn"
-                  onClick={callPostDeleteAPI}
-                >
-                  삭제
-                </button>
-              </div>
+              <span className="ml-80">
+                  <button
+                    type="button"
+                    className="border-2 w-12 h-7"
+                    onClick={toBoardHome}
+                  >
+                    목록
+                  </button>
+                  <button
+                    type="button"
+                    className="border-2 w-12 h-7"
+                    onClick={() => setEdit(true)}
+                  >
+                    수정
+                  </button>
+                  <button
+                    type="button"
+                    className="border-2 w-12 h-7"
+                    id="postDeleteBtn"
+                    onClick={callPostDeleteAPI}
+                  >
+                    삭제
+                  </button>
+              </span>
             </div>
             <div className="w-100 my-2">
               <div>{data.post.content}</div>

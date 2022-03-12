@@ -20,6 +20,7 @@ export default function Post({ postId }: { postId: string }) {
     register: cRegister,
     handleSubmit: cHandleSubmit,
     getValues: cGetValues,
+    setValue: cSetValue,
   } = useForm();
   const { isLoading, isError, isSuccess, data, error } = useQuery("post", () =>
     fetchPost(postId)
@@ -66,6 +67,7 @@ export default function Post({ postId }: { postId: string }) {
         if (res) {
           console.log(res);
         }
+        cSetValue("content", "");
         queryClient.invalidateQueries();
       })
       .catch((error) => console.log(error));
@@ -123,26 +125,26 @@ export default function Post({ postId }: { postId: string }) {
         ) : (
           <>
             <div className="header">
-              <h2 className="text-4xl">{data.post.title}</h2>
-              <span>{data.post.username}</span>
+              <h2 className="text-4xl inline-block">{data.post.title}</h2>
+              <span className="ml-1">{data.post.username}</span>
               <div className="float-end">
                 <button
                   type="button"
-                  className="border-2 w-20 h-10"
+                  className="border-2 w-12 h-7"
                   onClick={toBoardHome}
                 >
                   목록
                 </button>
                 <button
                   type="button"
-                  className="border-2 w-20 h-10"
+                  className="border-2 w-12 h-7"
                   onClick={() => setEdit(true)}
                 >
                   수정
                 </button>
                 <button
                   type="button"
-                  className="border-2 w-20 h-10"
+                  className="border-2 w-12 h-7"
                   id="postDeleteBtn"
                   onClick={callPostDeleteAPI}
                 >
@@ -150,11 +152,12 @@ export default function Post({ postId }: { postId: string }) {
                 </button>
               </div>
             </div>
-            <div className="w-100 mt-2">
+            <div className="w-100 my-2">
               <div>{data.post.content}</div>
             </div>
             <hr />
-            <div className="mt-2 p-2">
+            <div className="mt-2">
+              <div>댓글 ({data.commentList.length})</div>
               {data.commentList.map((comment) => (
                 <div key={comment.id}>
                   <div>
@@ -162,7 +165,7 @@ export default function Post({ postId }: { postId: string }) {
                     <span>{comment.username} </span>
                     <button
                       onClick={() => callCommentDeleteAPI(comment.id + "")}
-                      className="border rounded w-20 h-10 text-blue"
+                      className="border rounded w-12 h-7"
                     >
                       삭제
                     </button>
@@ -170,15 +173,17 @@ export default function Post({ postId }: { postId: string }) {
                 </div>
               ))}
               <hr />
-              <div>
-                <form onSubmit={cHandleSubmit(() => callCommentSaveAPI(postId))}>
+              <div className="mt-2">
+                <form
+                  onSubmit={cHandleSubmit(() => callCommentSaveAPI(postId))}
+                >
                   <label htmlFor="comment-content"></label>
                   <input
                     id="comment-content"
                     className="border-2"
                     {...cRegister("content", { required: true })}
                   />
-                  <button className="border-0 rounded w-20 h-10 bg-black hover:bg-red-400 text-white">
+                  <button className="border-0 rounded w-11 h-7 bg-black hover:bg-red-400 text-white">
                     작성
                   </button>
                 </form>

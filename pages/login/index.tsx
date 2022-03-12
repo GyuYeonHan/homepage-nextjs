@@ -1,11 +1,14 @@
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
+import { useSetRecoilState } from "recoil";
 import { BASE_PATH } from "../../apiCall/base";
+import { sessionState } from "../../atom/session";
 
 export default function Login() {
   const router = useRouter();
   const { register, handleSubmit, getValues } = useForm();
+  const setSession = useSetRecoilState(sessionState);
 
   axios.defaults.withCredentials = true;
 
@@ -15,7 +18,8 @@ export default function Login() {
       .post(`${BASE_PATH}/api/auth/login`, data)
       .then((res) => {
         if (res) {
-          console.log(res);
+          const username = res.data.user.username;
+          setSession(username);
         }
       })
       .catch();
@@ -28,7 +32,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="">
       <div className="text-2xl mb-3">로그인 페이지</div>
       <form onSubmit={handleSubmit(onValid)}>
         <label htmlFor="login-id">로그인 아이디</label>

@@ -1,7 +1,6 @@
 import axios from "axios";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery, useQueryClient } from "react-query";
 import { BASE_PATH, POST_PATH } from "../../apiCall/base";

@@ -1,6 +1,7 @@
 import axios from "axios";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
+import { useEffect } from "react";
 import { useRecoilState } from "recoil";
 import { BASE_PATH } from "../apiCall/base";
 import { sessionState } from "../atom/session";
@@ -22,6 +23,20 @@ export default function SideBar() {
       })
       .catch((error) => console.log(error));
   };
+
+  const getSession = () => {
+    axios
+      .get(`${BASE_PATH}/api/auth/session`)
+      .then((res) => {
+        console.log(res.data)
+        if (res.data.loggedIn) {
+          setSession(res.data.username);
+        }
+      })
+      .catch();
+  };
+
+  useEffect(getSession, []);
 
   return (
     <nav className="w-1/4 h-screen bg-sky-500">

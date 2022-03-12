@@ -31,17 +31,6 @@ export default function Board() {
       .catch((error) => console.log(error));
   };
 
-  const getSession = () => {
-    axios
-      .get(`${BASE_PATH}/api/auth/session`)
-      .then((res) => {
-        if (res) {
-          console.log(res);
-        }
-      })
-      .catch();
-  };
-
   if (isLoading) {
     return <span>Loading...</span>;
   }
@@ -55,7 +44,6 @@ export default function Board() {
             <span>홈</span>
           </a>
         </Link>
-        <button onClick={getSession}>세션확인</button>
         {write ? (
           <div>
             <form onSubmit={handleSubmit(callPostSaveAPI)}>

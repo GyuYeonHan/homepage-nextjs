@@ -5,7 +5,7 @@ export default function Layout({ children }) {
     <div className="container w-full h-screen">
       <div className="h-full flex justify-start items-center">
         <SideBar />
-        <div className="w-3/4 h-full m-6">{children}</div>
+        <div className="w-3/4 m-6">{children}</div>
       </div>
     </div>
   );

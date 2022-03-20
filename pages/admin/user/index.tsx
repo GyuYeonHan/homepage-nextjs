@@ -1,3 +1,12 @@
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import axios from "axios";
 import Link from "next/link";
 import { useState } from "react";
@@ -37,7 +46,6 @@ export default function User() {
 
   return (
     <div className="container w-screen h-full">
-      <div className="">유저 관리 페이지 입니다.</div>
       <div className="container">
         <h2 className="text-4xl">유저 관리</h2>
         {write ? (
@@ -100,30 +108,39 @@ export default function User() {
             >
               유저 추가
             </button>
-            <table className="table-auto border-2">
-              <thead className="table-header-group border-2">
-                <tr>
-                  <th>유저 번호</th>
-                  <th>이름</th>
-                  <th>권한</th>
-                  <th>가입일</th>
-                </tr>
-              </thead>
-              <tbody className="table-row-group">
-                {data?.map((user) => (
-                  <tr key={user.id} className="table-row hover:opacity-50">
-                    <td className="table-cell">{user.id}</td>
-                    <td className="table-cell">
-                      <Link href={`/user/${user.id}`}>
-                        <a>{user.username}</a>
-                      </Link>
-                    </td>
-                    <td className="table-cell">{user.role}</td>
-                    <td className="table-cell">{user.createdDate}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">유저 번호</TableCell>
+                    <TableCell align="center">이름</TableCell>
+                    <TableCell align="center">ID</TableCell>
+                    <TableCell align="center">권한</TableCell>
+                    <TableCell align="center">가입일</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data.map((user) => (
+                    <TableRow
+                      key={user.id}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row" align="center">
+                        {user.id}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Link href={`/user/${user.id}`}>
+                          <a>{user.username}</a>
+                        </Link>
+                      </TableCell>
+                      <TableCell align="center">{user.loginId}</TableCell>
+                      <TableCell align="center">{user.role}</TableCell>
+                      <TableCell align="center">{user.createdDate}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </>
         )}
       </div>

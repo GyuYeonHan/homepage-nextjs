@@ -1,3 +1,17 @@
+import {
+  Box,
+  Button,
+  Container,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
 import Link from "next/link";
 import { useState } from "react";
@@ -36,74 +50,83 @@ export default function Board() {
   }
 
   return (
-    <>
-      <div className="container">
-        <h2 className="text-4xl">게시판</h2>
-        {write ? (
-          <div>
-            <form onSubmit={handleSubmit(callPostSaveAPI)}>
-              <label htmlFor="title">제목</label>
-              <input
-                id="title"
-                className="border-2 border-"
-                {...register("title", { required: true })}
-              />
-              <br />
-              <label htmlFor="content">내용</label>
-              <input
-                id="content"
-                className="border-2"
-                {...register("content", { required: true })}
-              />
-              <hr />
-              <div className="my-2">
-                <button className="border-0 rounded w-20 h-10 bg-black hover:bg-red-400 text-white">
-                  작성
-                </button>
-                <button
-                  onClick={() => setWrite(false)}
-                  className="border-2 rounded w-20 h-10 bg-white hover:bg-white/70 text-black"
-                >
-                  취소
-                </button>
-              </div>
-            </form>
-          </div>
-        ) : (
-          <>
-            <button
-              className="border-0 rounded w-24 h-8 bg-lime-600/80 hover:bg-lime-600 text-white"
-              onClick={() => setWrite(true)}
-            >
-              새 글 쓰기
-            </button>
-            <table className="table-auto border-2">
-              <thead className="table-header-group border-2">
-                <tr>
-                  <th>게시글번호</th>
-                  <th>제목</th>
-                  <th>작성자</th>
-                  <th>최종 수정일</th>
-                </tr>
-              </thead>
-              <tbody className="table-row-group">
-                {data?.map((post) => (
-                  <tr key={post.id} className="table-row hover:opacity-50">
-                    <td className="table-cell">{post.id}</td>
-                    <td className="table-cell">
+    <Box>
+      {write ? (
+        <Box>
+          <form onSubmit={handleSubmit(callPostSaveAPI)}>
+            <TextField
+              id="outlined-basic"
+              label="제목"
+              variant="outlined"
+              {...register("title", { required: true })}
+            />
+            <br />
+            <TextField
+              id="outlined-basic"
+              label="내용"
+              variant="outlined"
+              multiline
+              {...register("content", { required: true })}
+            />
+            <hr />
+            <div className="my-2">
+              <button className="border-0 rounded w-20 h-10 bg-black hover:bg-red-400 text-white">
+                작성
+              </button>
+              <button
+                onClick={() => setWrite(false)}
+                className="border-2 rounded w-20 h-10 bg-white hover:bg-white/70 text-black"
+              >
+                취소
+              </button>
+            </div>
+          </form>
+        </Box>
+      ) : (
+        <Box>
+          <Typography component="h2" variant="h2">
+            게시판
+          </Typography>
+          <Button
+            variant="text"
+            onClick={() => setWrite(true)}
+            sx={{ float: "right" }}
+          >
+            새 글 쓰기
+          </Button>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">No.</TableCell>
+                  <TableCell align="center">제목</TableCell>
+                  <TableCell align="center">작성자</TableCell>
+                  <TableCell align="center">최종 수정일</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.map((post) => (
+                  <TableRow
+                    key={post.id}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row" align="center">
+                      {post.id}
+                    </TableCell>
+                    <TableCell align="center">
                       <Link href={`/board/${post.id}`}>
                         <a>{post.title}</a>
                       </Link>
-                    </td>
-                    <td className="table-cell">{post.username}</td>
-                    <td className="table-cell">{post.modifiedDate}</td>
-                  </tr>
+                    </TableCell>
+                    <TableCell align="center">{post.username}</TableCell>
+                    <TableCell align="center">{post.modifiedDate}</TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
-          </>
-        )}
-      </div>
-    </>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      )}
+    </Box>
   );
 }

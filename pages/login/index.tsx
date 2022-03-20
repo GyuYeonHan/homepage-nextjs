@@ -1,14 +1,28 @@
+import {
+  Avatar,
+  Box,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
+import Link from "next/link";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
 import { BASE_PATH } from "../../apiCall/base";
 import { sessionState } from "../../atom/session";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 export default function Login() {
   const router = useRouter();
   const { register, handleSubmit, getValues } = useForm();
   const setSession = useSetRecoilState(sessionState);
+  const [error, setError] = useState(false);
 
   axios.defaults.withCredentials = true;
 
@@ -27,37 +41,73 @@ export default function Login() {
     router.push(`/`);
   };
 
-  const toHome = () => {
-    router.push(`/`);
-  };
-
   return (
-    <div className="border-2 p-2 h-60 flex justify-center">
-      <div className="w-full flex flex-col justify-center items-center">
-        <div className="text-2xl mb-3">로그인 페이지</div>
-        <form className="w-full" onSubmit={handleSubmit(onValid)}>
-          <input
-            id="login-id"
-            className="border-2 rounded w-3/4 h-10 mx-auto"
-            placeholder="아이디"
-            type="text"
-            {...register("loginId", { required: true })}
-          />
-          <br />
-          <input
-            id="password"
-            className="border-2 rounded w-3/4 h-10 mx-auto"
-            placeholder="비밀번호"
-            type="password"
-            {...register("password", { required: true })}
-          />
-          <div className="my-3 w-full h-10">
-            <button className="border-0 rounded w-full h-full bg-sky-600/80 hover:bg-sky-600 text-white">
-              로그인
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <Box
+      sx={{
+        marginTop: 8,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+        <LockOutlinedIcon />
+      </Avatar>
+      <Typography component="h1" variant="h5">
+        로그인
+      </Typography>
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onValid)}
+        noValidate
+        sx={{ mt: 1 }}
+      >
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="email"
+          label="아이디"
+          name="loginId"
+          autoComplete="loginId"
+          autoFocus
+          {...register("loginId", { required: true })}
+        />
+
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="password"
+          label="비밀번호"
+          type="password"
+          id="password"
+          autoComplete="current-password"
+          {...register("password", { required: true })}
+        />
+        <FormControlLabel
+          control={<Checkbox value="remember" color="primary" />}
+          label="로그인 정보 유지"
+        />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+        >
+          로그인
+        </Button>
+        <Grid container>
+          <Grid item xs>
+            <Link href="/">
+              <a>Forgot password?</a>
+            </Link>
+          </Grid>
+          <Grid item>
+            <Link href="/home">{"Don't have an account? Sign Up"}</Link>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
 }

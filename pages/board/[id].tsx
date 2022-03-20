@@ -6,23 +6,38 @@ import { useForm } from "react-hook-form";
 import { useQuery, useQueryClient } from "react-query";
 import { BASE_PATH, COMMENT_PATH, POST_PATH } from "../../apiCall/base";
 import { fetchPost } from "../../apiCall/post";
-import { Editor } from "@tinymce/tinymce-react";
+import {
+  Button,
+  ButtonGroup,
+  Container,
+  Divider,
+  IconButton,
+  Typography,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import ListIcon from "@mui/icons-material/List";
+import ClearIcon from "@mui/icons-material/Clear";
+import { Box } from "@mui/system";
 
 export default function Post({ postId }: { postId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [edit, setEdit] = useState(false);
+
   const {
     register: pRegister,
     handleSubmit: pHandleSubmit,
     getValues: pGetValues,
   } = useForm();
+
   const {
     register: cRegister,
     handleSubmit: cHandleSubmit,
     getValues: cGetValues,
     setValue: cSetValue,
   } = useForm();
+
   const { isLoading, isError, isSuccess, data, error } = useQuery("post", () =>
     fetchPost(postId)
   );
@@ -128,59 +143,59 @@ export default function Post({ postId }: { postId: string }) {
             </form>
           </div>
         ) : (
-          <>
-            <div className="header">
-              <h2 className="text-4xl inline-block">{data.post.title}</h2>
-              <span className="ml-1">{data.post.username}</span>
-              <span className="ml-60">
-                <button
-                  type="button"
-                  className="border-2 w-12 h-7"
-                  onClick={toBoardHome}
-                >
+          <Box
+            sx={{
+              width: 600,
+            }}
+          >
+            <Box>
+              <Typography variant="h3" component="span">
+                {data.post.title}
+              </Typography>
+              <Typography component="span" align="right">
+                {data.post.username}
+              </Typography>
+              <ButtonGroup
+                variant="contained"
+                aria-label="contained primary button group"
+                size="small"
+                color="primary"
+                sx={{
+                  float: "right",
+                }}
+              >
+                <Button startIcon={<ListIcon />} onClick={toBoardHome}>
                   목록
-                </button>
-                <button
-                  type="button"
-                  className="border-2 w-12 h-7"
-                  onClick={() => setEdit(true)}
-                >
+                </Button>
+                <Button startIcon={<EditIcon />} onClick={() => setEdit(true)}>
                   수정
-                </button>
-                <button
-                  type="button"
-                  className="border-2 w-12 h-7"
-                  id="postDeleteBtn"
-                  onClick={callPostDeleteAPI}
-                >
+                </Button>
+                <Button startIcon={<DeleteIcon />} onClick={callPostDeleteAPI}>
                   삭제
-                </button>
-              </span>
-            </div>
-            <div className="w-100 my-2">
-              <div>{data.post.content}</div>
-            </div>
-            <hr />
-            <div className="mt-2">
-              <div>댓글 ({data.commentList.length})</div>
+                </Button>
+              </ButtonGroup>
+            </Box>
+            <Divider />
+            <Box sx={{ width: 300, height: 100, my: 2 }}>
+              {data.post.content}
+            </Box>
+            <Divider />
+            <Box sx={{ width: 300, height: 200, my: 2 }}>
+              <Typography>댓글 ({data.commentList.length})</Typography>
               {data.commentList.map((comment) => (
-                <div key={comment.id}>
-                  <div className="my-2">
+                <Box key={comment.id}>
                     <span className="font-bold inline">
                       {comment.username}{" "}
                     </span>
                     <span className="">{comment.modifiedDate} </span>
-                    <button
+                    <IconButton
                       onClick={() => callCommentDeleteAPI(comment.id + "")}
-                      className="border rounded w-12 h-7"
                     >
-                      삭제
-                    </button>
-                    <p>{comment.content} </p>
-                  </div>
-                </div>
+                      <DeleteIcon />
+                    </IconButton>
+                    <Typography component="p">{comment.content} </Typography>
+                </Box>
               ))}
-              <hr />
               <div className="mt-2">
                 <form
                   onSubmit={cHandleSubmit(() => callCommentSaveAPI(postId))}
@@ -196,8 +211,8 @@ export default function Post({ postId }: { postId: string }) {
                   </button>
                 </form>
               </div>
-            </div>
-          </>
+            </Box>
+          </Box>
         )}
       </div>
     </div>

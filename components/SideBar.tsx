@@ -1,77 +1,91 @@
-import axios from "axios";
-import Link from "next/link";
-import Router, { useRouter } from "next/router";
-import { useEffect } from "react";
-import { useRecoilState } from "recoil";
-import { BASE_PATH } from "../apiCall/base";
-import { sessionState } from "../atom/session";
+import * as React from "react";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import MailIcon from "@mui/icons-material/Mail";
+import Toolbar from "@mui/material/Toolbar";
+import { ArrowBack } from "@mui/icons-material";
 
-export default function SideBar() {
-  const [session, setSession] = useRecoilState(sessionState);
-  const router = useRouter();
-  axios.defaults.withCredentials = true;
+const drawerWidth = 240;
 
-  const callLogoutAPI = () => {
-    axios
-      .post(`${BASE_PATH}/api/auth/logout`)
-      .then((res) => {
-        if (res) {
-          console.log(res);
-          setSession("");
-          router.push("/");
-        }
-      })
-      .catch((error) => console.log(error));
-  };
+interface Props {
+  window?: () => Window;
+  mobileOpen: boolean;
+  handleDrawerToggle: Function;
+}
 
-  const getSession = () => {
-    axios
-      .get(`${BASE_PATH}/api/auth/session`)
-      .then((res) => {
-        console.log(res.data)
-        if (res.data.loggedIn) {
-          setSession(res.data.username);
-        }
-      })
-      .catch();
-  };
+export default function SideBar(props: Props) {
+  const { window, mobileOpen, handleDrawerToggle } = props;
 
-  useEffect(getSession, []);
+  const drawer = (
+    <div>
+      <Toolbar>
+        <IconButton onClick={() => handleDrawerToggle()}>
+          <ArrowBack />
+        </IconButton>
+      </Toolbar>
+      <Divider />
+      <List>
+        {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
+          <ListItem button key={text}>
+            <ListItemIcon>
+              {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+            </ListItemIcon>
+            <ListItemText primary={text} />
+          </ListItem>
+        ))}
+      </List>
+      <Divider />
+      <List>
+        {["All mail", "Trash", "Spam"].map((text, index) => (
+          <ListItem button key={text}>
+            <ListItemIcon>
+              {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+            </ListItemIcon>
+            <ListItemText primary={text} />
+          </ListItem>
+        ))}
+      </List>
+    </div>
+  );
+
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <nav className="w-1/4 h-screen bg-sky-500">
-      <div className="m-2">
-        <div className="logo text-center">
-          <img src="https://okky.kr/assets/images/okjsp_logo.png" />
-        </div>
-        {session == "" ? (
-          <Link href="/login">
-            <a className="text-4xl">로그인</a>
-          </Link>
-        ) : (
-          <div>
-            <div>{session}</div>
-            <div className="">
-              <Link href="/admin">
-                <a className="text-2xl">관리자 페이지</a>
-              </Link>
-            </div>
-            <button onClick={callLogoutAPI} className="border-2 bg-white">
-              로그아웃
-            </button>
-          </div>
-        )}
-        <div className="">
-          <Link href="/">
-            <a className="text-4xl">홈</a>
-          </Link>
-        </div>
-        <div className="">
-          <Link href="/board">
-            <a className="text-4xl">게시판</a>
-          </Link>
-        </div>
-      </div>
-    </nav>
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
+      <Box
+        component="nav"
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        aria-label="mailbox folders"
+      >
+        <Drawer
+          container={container}
+          variant="temporary"
+          open={mobileOpen}
+          onClose={() => handleDrawerToggle()}
+          ModalProps={{
+            keepMounted: true,
+          }}
+          sx={{
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
+          }}
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+    </Box>
   );
 }

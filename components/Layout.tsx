@@ -1,12 +1,21 @@
-import SideBar from "./SideBar";
+import { Box, Container } from "@mui/material";
+import ButtonAppBar from "./ButtonAppBar";
 
 export default function Layout({ children }) {
   return (
-    <div className="container w-full h-screen">
-      <div className="h-full flex justify-start items-center">
-        <SideBar />
-        <div className="w-3/4 m-6">{children}</div>
-      </div>
-    </div>
+    <Container component="main" maxWidth="xs">
+      <ButtonAppBar />
+      <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: 800,
+      }}
+      >
+        {children}
+      </Box>
+    </Container>
   );
 }

@@ -13,6 +13,8 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { BASE_PATH } from "../apiCall/base";
 import SideBar from "./SideBar";
+import { Avatar } from "@mui/material";
+import { Person } from "@mui/icons-material";
 
 export default function ButtonAppBar() {
   const [session, setSession] = useRecoilState(sessionState);
@@ -44,12 +46,44 @@ export default function ButtonAppBar() {
       .catch();
   };
 
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-    console.log(mobileOpen);
+  const handleDrawerOpen = () => {
+    setOpen(true);
   };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+
+  function stringToColor(string: string) {
+    let hash = 0;
+    let i;
+
+    /* eslint-disable no-bitwise */
+    for (i = 0; i < string.length; i += 1) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    let color = "#";
+
+    for (i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.substr(-2);
+    }
+    /* eslint-enable no-bitwise */
+
+    return color;
+  }
+
+  function stringAvatar(name: string) {
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+      },
+      children: `${name[0]}`,
+    };
+  }
 
   useEffect(getSession, []);
 
@@ -62,7 +96,7 @@ export default function ButtonAppBar() {
             edge="start"
             color="inherit"
             aria-label="menu"
-            onClick={handleDrawerToggle}
+            onClick={handleDrawerOpen}
             sx={{ mr: 2 }}
           >
             <MenuIcon />
@@ -72,11 +106,10 @@ export default function ButtonAppBar() {
               <a>용석 아카데미</a>
             </Link>
           </Typography>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 50 }}>
-            <Link href="/board">
-              <a>게시판</a>
-            </Link>
-          </Typography>
+          <Avatar {...stringAvatar(session.username)} />
+          <IconButton size="medium" color="inherit">
+            <Person />
+          </IconButton>
           <Button color="inherit">
             {session.connected ? (
               <Link href="/">
@@ -90,10 +123,7 @@ export default function ButtonAppBar() {
           </Button>
         </Toolbar>
       </AppBar>
-      <SideBar
-        mobileOpen={mobileOpen}
-        handleDrawerToggle={handleDrawerToggle}
-      />
+      <SideBar open={open} handleDrawerClose={handleDrawerClose} />
     </Box>
   );
 }

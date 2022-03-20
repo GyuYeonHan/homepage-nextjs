@@ -7,11 +7,17 @@ import { useQuery, useQueryClient } from "react-query";
 import { BASE_PATH, COMMENT_PATH, POST_PATH } from "../../apiCall/base";
 import { fetchPost } from "../../apiCall/post";
 import {
+  Backdrop,
   Button,
   ButtonGroup,
+  CircularProgress,
   Container,
   Divider,
+  FormControl,
   IconButton,
+  Input,
+  OutlinedInput,
+  TextField,
   Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -102,120 +108,126 @@ export default function Post({ postId }: { postId: string }) {
   };
 
   if (isLoading) {
-    return <span>Loading...</span>;
+    return (
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isLoading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    );
   }
 
+  const editPostForm = (
+    <form onSubmit={pHandleSubmit(callPostEditAPI)}>
+      <Box sx={{ my: 2 }}>
+        <TextField
+          id="post-title"
+          variant="standard"
+          fullWidth
+          defaultValue={data.post.title}
+          {...pRegister("title", { required: true })}
+        />
+      </Box>
+      <Box sx={{ my: 2 }}>
+        <TextField
+          id="post-content"
+          variant="outlined"
+          fullWidth
+          multiline
+          rows={8}
+          defaultValue={data.post.content}
+          {...pRegister("content", { required: true })}
+        />
+      </Box>
+      <ButtonGroup variant="contained">
+        <Button type="submit">수정</Button>
+        <Button onClick={() => setEdit(false)}>취소</Button>
+      </ButtonGroup>
+    </form>
+  );
+
   return (
-    <div>
-      <div>
-        {edit ? (
-          <div>
-            <form onSubmit={pHandleSubmit(callPostEditAPI)}>
-              <label htmlFor="post-title">제목</label>
-              <br />
-              <input
-                id="post-title"
-                className="border-2"
-                value={data.post.title}
-                {...pRegister("title", { required: true })}
-              />
-              <br />
-              <label htmlFor="post-content">내용</label>
-              <br />
-              <textarea
-                id="post-content"
-                className="border-2"
-                value={data.post.content}
-                {...pRegister("content", { required: true })}
-              />
-              <hr />
-              <div className="my-2">
-                <button className="border-0 rounded w-20 h-10 bg-black hover:bg-red-400 text-white">
-                  수정
-                </button>
-                <button
-                  onClick={() => setEdit(false)}
-                  className="border-0 rounded w-20 h-10 bg-black hover:bg-red-400 text-white"
-                >
-                  취소
-                </button>
-              </div>
-            </form>
-          </div>
-        ) : (
-          <Box
-            sx={{
-              width: 600,
-            }}
-          >
+    <Box>
+      <Typography component="h2" variant="h2">
+        게시판
+      </Typography>
+      {edit ? (
+        <Box>{editPostForm}</Box>
+      ) : (
+        <Box sx={{mt:2}}>
+          <Box>
+            <Typography variant="h3" component="span">
+              {data.post.title}
+            </Typography>
+            <Typography component="span" align="right">
+              {data.post.username}
+            </Typography>
+            <ButtonGroup
+              variant="contained"
+              aria-label="contained primary button group"
+              size="small"
+              color="primary"
+              sx={{
+                float: "right",
+              }}
+            >
+              <Button startIcon={<ListIcon />} onClick={toBoardHome}>
+                목록
+              </Button>
+              <Button startIcon={<EditIcon />} onClick={() => setEdit(true)}>
+                수정
+              </Button>
+              <Button startIcon={<DeleteIcon />} onClick={callPostDeleteAPI}>
+                삭제
+              </Button>
+            </ButtonGroup>
+          </Box>
+          <Divider />
+          <Box sx={{ minHeight: 100, my: 2 }}>{data.post.content}</Box>
+          <Divider />
+          <Box sx={{ my: 2 }}>
+            <Typography sx={{ mb: 2 }}>
+              댓글 ({data.commentList.length})
+            </Typography>
             <Box>
-              <Typography variant="h3" component="span">
-                {data.post.title}
-              </Typography>
-              <Typography component="span" align="right">
-                {data.post.username}
-              </Typography>
-              <ButtonGroup
-                variant="contained"
-                aria-label="contained primary button group"
-                size="small"
-                color="primary"
-                sx={{
-                  float: "right",
-                }}
-              >
-                <Button startIcon={<ListIcon />} onClick={toBoardHome}>
-                  목록
-                </Button>
-                <Button startIcon={<EditIcon />} onClick={() => setEdit(true)}>
-                  수정
-                </Button>
-                <Button startIcon={<DeleteIcon />} onClick={callPostDeleteAPI}>
-                  삭제
-                </Button>
-              </ButtonGroup>
-            </Box>
-            <Divider />
-            <Box sx={{ width: 300, height: 100, my: 2 }}>
-              {data.post.content}
-            </Box>
-            <Divider />
-            <Box sx={{ width: 300, height: 200, my: 2 }}>
-              <Typography>댓글 ({data.commentList.length})</Typography>
               {data.commentList.map((comment) => (
-                <Box key={comment.id}>
-                    <span className="font-bold inline">
-                      {comment.username}{" "}
-                    </span>
-                    <span className="">{comment.modifiedDate} </span>
+                <Box key={comment.id} sx={{ mb: 2 }}>
+                  <Typography variant="h6" component="span">
+                    {comment.username}{" "}
+                  </Typography>
+                  <Typography component="span">
+                    {comment.modifiedDate}{" "}
+                  </Typography>
+                  <Box>
+                    <Typography component="span">{comment.content} </Typography>
                     <IconButton
                       onClick={() => callCommentDeleteAPI(comment.id + "")}
+                      sx={{ float: "right" }}
                     >
                       <DeleteIcon />
                     </IconButton>
-                    <Typography component="p">{comment.content} </Typography>
+                  </Box>
                 </Box>
               ))}
-              <div className="mt-2">
-                <form
-                  onSubmit={cHandleSubmit(() => callCommentSaveAPI(postId))}
-                >
-                  <label htmlFor="comment-content"></label>
-                  <input
-                    id="comment-content"
-                    className="border-2"
+            </Box>
+            <Box>
+              <form onSubmit={cHandleSubmit(() => callCommentSaveAPI(postId))}>
+                <Box sx={{ display: "flex" }}>
+                  <Input
+                    placeholder="댓글을 입력하세요."
+                    inputProps={{ "aria-label": "comment write" }}
+                    fullWidth
                     {...cRegister("content", { required: true })}
                   />
-                  <button className="border-0 rounded w-11 h-7 bg-black hover:bg-red-400 text-white">
-                    작성
-                  </button>
-                </form>
-              </div>
+                  <Button type="submit">작성</Button>
+                </Box>
+              </form>
             </Box>
           </Box>
-        )}
-      </div>
-    </div>
+        </Box>
+      )}
+    </Box>
   );
 }
 

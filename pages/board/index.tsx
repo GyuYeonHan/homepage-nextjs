@@ -1,7 +1,17 @@
+import { Search } from "@mui/icons-material";
 import {
+  Backdrop,
   Box,
   Button,
+  ButtonGroup,
+  CircularProgress,
   Container,
+  Divider,
+  IconButton,
+  Input,
+  InputAdornment,
+  InputBase,
+  Pagination,
   Paper,
   Table,
   TableBody,
@@ -46,47 +56,52 @@ export default function Board() {
   };
 
   if (isLoading) {
-    return <span>Loading...</span>;
+    return (
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isLoading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    );
   }
+
+  const savePostForm = (
+    <form onSubmit={handleSubmit(callPostSaveAPI)}>
+      <Box sx={{ my: 2 }}>
+        <TextField
+          id="post-title"
+          variant="standard"
+          fullWidth
+          {...register("title", { required: true })}
+        />
+      </Box>
+      <Box sx={{ my: 2 }}>
+        <TextField
+          id="post-content"
+          variant="outlined"
+          fullWidth
+          multiline
+          rows={8}
+          {...register("content", { required: true })}
+        />
+      </Box>
+      <ButtonGroup variant="contained">
+        <Button type="submit">작성</Button>
+        <Button onClick={() => setWrite(false)}>취소</Button>
+      </ButtonGroup>
+    </form>
+  );
 
   return (
     <Box>
+      <Typography component="h2" variant="h2">
+        게시판
+      </Typography>
       {write ? (
-        <Box>
-          <form onSubmit={handleSubmit(callPostSaveAPI)}>
-            <TextField
-              id="outlined-basic"
-              label="제목"
-              variant="outlined"
-              {...register("title", { required: true })}
-            />
-            <br />
-            <TextField
-              id="outlined-basic"
-              label="내용"
-              variant="outlined"
-              multiline
-              {...register("content", { required: true })}
-            />
-            <hr />
-            <div className="my-2">
-              <button className="border-0 rounded w-20 h-10 bg-black hover:bg-red-400 text-white">
-                작성
-              </button>
-              <button
-                onClick={() => setWrite(false)}
-                className="border-2 rounded w-20 h-10 bg-white hover:bg-white/70 text-black"
-              >
-                취소
-              </button>
-            </div>
-          </form>
-        </Box>
+        <Box sx={{ width: 1 }}>{savePostForm}</Box>
       ) : (
         <Box>
-          <Typography component="h2" variant="h2">
-            게시판
-          </Typography>
           <Button
             variant="text"
             onClick={() => setWrite(true)}
@@ -95,7 +110,7 @@ export default function Board() {
             새 글 쓰기
           </Button>
           <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <Table sx={{ minWidth: 300 }} aria-label="simple table">
               <TableHead>
                 <TableRow>
                   <TableCell align="center">No.</TableCell>
@@ -125,6 +140,28 @@ export default function Board() {
               </TableBody>
             </Table>
           </TableContainer>
+          <Box
+            sx={{
+              my: 1,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Pagination count={10} />
+          </Box>
+          <Box sx={{ mt: 2 }}>
+            <Input
+              placeholder="Search…"
+              fullWidth
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton>
+                    <Search />
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+          </Box>
         </Box>
       )}
     </Box>

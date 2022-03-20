@@ -44,7 +44,7 @@ export default function Login() {
   return (
     <Box
       sx={{
-        marginTop: 8,
+        marginTop: 6,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -93,11 +93,11 @@ export default function Login() {
           type="submit"
           fullWidth
           variant="contained"
-          sx={{ mt: 3, mb: 2 }}
+          sx={{ mt: 2, mb: 2 }}
         >
           로그인
         </Button>
-        <Grid container>
+        {/* <Grid container>
           <Grid item xs>
             <Link href="/">
               <a>Forgot password?</a>
@@ -106,7 +106,7 @@ export default function Login() {
           <Grid item>
             <Link href="/home">{"Don't have an account? Sign Up"}</Link>
           </Grid>
-        </Grid>
+        </Grid> */}
       </Box>
     </Box>
   );

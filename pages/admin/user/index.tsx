@@ -1,11 +1,20 @@
 import {
+  Box,
+  Button,
+  ButtonGroup,
+  Divider,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
+  Typography,
 } from "@mui/material";
 import axios from "axios";
 import Link from "next/link";
@@ -45,105 +54,106 @@ export default function User() {
   }
 
   return (
-    <div className="container w-screen h-full">
-      <div className="container">
-        <h2 className="text-4xl">유저 관리</h2>
-        {write ? (
-          <div>
-            <form onSubmit={handleSubmit(callUserSaveAPI)}>
-              <label htmlFor="username">이름</label>
-              <input
-                id="username"
-                className="border-2 border-"
-                type="text"
-                {...register("username", { required: true })}
-              />
-              <br />
-              <label htmlFor="loginId">아이디</label>
-              <input
-                id="loginId"
-                className="border-2 border-"
-                type="text"
-                {...register("loginId", { required: true })}
-              />
-              <br />
-              <label htmlFor="password">비밀번호</label>
-              <input
-                id="password"
-                className="border-2 border-"
-                type="password"
-                {...register("password", { required: true })}
-              />
-              <br />
-              <label htmlFor="role">권한</label>
-              <select
-                id="role"
-                className="border-2"
-                {...register("role", { required: true })}
-              >
-                <option value="ROLE_USER">일반 사용자</option>
-                <option value="ROLE_STUDENT">학생</option>
-                <option value="ROLE_TEACHER">선생님</option>
-                <option value="ROLE_ADMIN">관리자</option>
-              </select>
-              <hr />
-              <div className="my-2">
-                <button className="border-0 rounded w-20 h-10 bg-black hover:bg-red-400 text-white">
-                  추가
-                </button>
-                <button
-                  onClick={() => setWrite(false)}
-                  className="border-2 rounded w-20 h-10 bg-white hover:bg-white/70 text-black"
-                >
-                  취소
-                </button>
-              </div>
-            </form>
-          </div>
-        ) : (
-          <>
-            <button
-              className="border-0 rounded w-24 h-8 bg-lime-600/80 hover:bg-lime-600 text-white"
-              onClick={() => setWrite(true)}
+    <Box>
+      <Typography component="h2" variant="h2">
+        유저 관리
+      </Typography>
+      {write ? (
+        <Box>
+          <Box
+            component="form"
+            x={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
+            onSubmit={handleSubmit(callUserSaveAPI)}
+          >
+            <TextField
+              id="user-username"
+              type="text"
+              variant="standard"
+              label="이름"
+              required
+              fullWidth
+              {...register("username", { required: true })}
+            />
+            <TextField
+              id="user-loginId"
+              type="text"
+              variant="standard"
+              label="아이디"
+              required
+              fullWidth
+              {...register("loginId", { required: true })}
+            />
+            <TextField
+              id="user-password"
+              type="password"
+              variant="standard"
+              label="비밀번호"
+              required
+              fullWidth
+              {...register("password", { required: true })}
+            />
+            <Select
+              id="user-role"
+              label="role"
+              required
+              defaultValue={"ROLE_USER"}
+              {...register("role", { required: true })}
             >
-              유저 추가
-            </button>
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="center">유저 번호</TableCell>
-                    <TableCell align="center">이름</TableCell>
-                    <TableCell align="center">ID</TableCell>
-                    <TableCell align="center">권한</TableCell>
-                    <TableCell align="center">가입일</TableCell>
+              <MenuItem value="ROLE_USER">일반 사용자</MenuItem>
+              <MenuItem value="ROLE_STUDENT">학생</MenuItem>
+              <MenuItem value="ROLE_TEACHER">선생님</MenuItem>
+              <MenuItem value="ROLE_ADMIN">관리자</MenuItem>
+            </Select>
+            <Box sx={{ my: 2 }}>
+              <ButtonGroup variant="contained">
+                <Button type="submit">추가</Button>
+                <Button onClick={() => setWrite(false)}>취소</Button>
+              </ButtonGroup>
+            </Box>
+          </Box>
+        </Box>
+      ) : (
+        <>
+          <Button onClick={() => setWrite(true)}>유저 추가</Button>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">유저 번호</TableCell>
+                  <TableCell align="center">이름</TableCell>
+                  <TableCell align="center">ID</TableCell>
+                  <TableCell align="center">권한</TableCell>
+                  <TableCell align="center">가입일</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.map((user) => (
+                  <TableRow
+                    key={user.id}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row" align="center">
+                      {user.id}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Link href={`/user/${user.id}`}>
+                        <a>{user.username}</a>
+                      </Link>
+                    </TableCell>
+                    <TableCell align="center">{user.loginId}</TableCell>
+                    <TableCell align="center">{user.role}</TableCell>
+                    <TableCell align="center">{user.createdDate}</TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data.map((user) => (
-                    <TableRow
-                      key={user.id}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row" align="center">
-                        {user.id}
-                      </TableCell>
-                      <TableCell align="center">
-                        <Link href={`/user/${user.id}`}>
-                          <a>{user.username}</a>
-                        </Link>
-                      </TableCell>
-                      <TableCell align="center">{user.loginId}</TableCell>
-                      <TableCell align="center">{user.role}</TableCell>
-                      <TableCell align="center">{user.createdDate}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </>
-        )}
-      </div>
-    </div>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </>
+      )}
+    </Box>
   );
 }

@@ -4,18 +4,19 @@ import ButtonAppBar from "./ButtonAppBar";
 
 export default function Layout({ children }) {
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main">
       <ButtonAppBar />
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
-          height: 800,
+          // justifyContent: "center",
+          height: 600,
+          pt: 12,
         }}
       >
-        {children}
+        <Box sx={{ width: 800 }}>{children}</Box>
       </Box>
     </Container>
   );

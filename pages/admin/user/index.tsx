@@ -62,7 +62,7 @@ export default function User() {
         <Box>
           <Box
             component="form"
-            x={{
+            sx={{
               "& .MuiTextField-root": { m: 1, width: "25ch" },
             }}
             noValidate
@@ -75,7 +75,6 @@ export default function User() {
               variant="standard"
               label="이름"
               required
-              fullWidth
               {...register("username", { required: true })}
             />
             <TextField
@@ -84,7 +83,6 @@ export default function User() {
               variant="standard"
               label="아이디"
               required
-              fullWidth
               {...register("loginId", { required: true })}
             />
             <TextField
@@ -93,7 +91,6 @@ export default function User() {
               variant="standard"
               label="비밀번호"
               required
-              fullWidth
               {...register("password", { required: true })}
             />
             <Select

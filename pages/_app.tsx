@@ -8,7 +8,6 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import Seo from "../components/Seo";
-import ResponsiveDrawer from "./test";
 
 function MyApp({ Component, pageProps }) {
   const queryClient = new QueryClient();
@@ -16,8 +15,10 @@ function MyApp({ Component, pageProps }) {
   return (
     <QueryClientProvider client={queryClient}>
       <RecoilRoot>
-        <ResponsiveDrawer />
-
+        <Layout>
+          {/* <Seo title={"Hi"} /> */}
+          <Component {...pageProps} />
+        </Layout>
       </RecoilRoot>
       <ReactQueryDevtools initialIsOpen={true} />
     </QueryClientProvider>

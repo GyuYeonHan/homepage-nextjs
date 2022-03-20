@@ -1,4 +1,5 @@
 import { Box, Container } from "@mui/material";
+import ResponsiveDrawer from "../pages/test";
 import ButtonAppBar from "./ButtonAppBar";
 
 export default function Layout({ children }) {
@@ -6,13 +7,13 @@ export default function Layout({ children }) {
     <Container component="main" maxWidth="xs">
       <ButtonAppBar />
       <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: 800,
-      }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: 800,
+        }}
       >
         {children}
       </Box>

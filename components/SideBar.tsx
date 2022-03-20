@@ -76,7 +76,7 @@ export default function SideBar(props: Props) {
             keepMounted: true,
           }}
           sx={{
-            display: { xs: "block", sm: "none" },
+            display: "block",
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,

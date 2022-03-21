@@ -11,25 +11,24 @@ import {
   Button,
   ButtonGroup,
   CircularProgress,
-  Container,
   Divider,
-  FormControl,
   IconButton,
   Input,
-  OutlinedInput,
   TextField,
   Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ListIcon from "@mui/icons-material/List";
-import ClearIcon from "@mui/icons-material/Clear";
 import { Box } from "@mui/system";
+import { useRecoilState } from "recoil";
+import { sessionState } from "../../atom/session";
 
 export default function Post({ postId }: { postId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [edit, setEdit] = useState(false);
+  const [session, setSession] = useRecoilState(sessionState);
 
   const {
     register: pRegister,
@@ -155,7 +154,7 @@ export default function Post({ postId }: { postId: string }) {
       {edit ? (
         <Box>{editPostForm}</Box>
       ) : (
-        <Box sx={{mt:2}}>
+        <Box sx={{ mt: 2 }}>
           <Box>
             <Typography variant="h3" component="span">
               {data.post.title}
@@ -175,9 +174,11 @@ export default function Post({ postId }: { postId: string }) {
               <Button startIcon={<ListIcon />} onClick={toBoardHome}>
                 목록
               </Button>
-              <Button startIcon={<EditIcon />} onClick={() => setEdit(true)}>
-                수정
-              </Button>
+              {session.username === data.post.username ? (
+                <Button startIcon={<EditIcon />} onClick={() => setEdit(true)}>
+                  수정
+                </Button>
+              ) : null}
               <Button startIcon={<DeleteIcon />} onClick={callPostDeleteAPI}>
                 삭제
               </Button>
@@ -211,19 +212,23 @@ export default function Post({ postId }: { postId: string }) {
                 </Box>
               ))}
             </Box>
-            <Box>
-              <form onSubmit={cHandleSubmit(() => callCommentSaveAPI(postId))}>
-                <Box sx={{ display: "flex" }}>
-                  <Input
-                    placeholder="댓글을 입력하세요."
-                    inputProps={{ "aria-label": "comment write" }}
-                    fullWidth
-                    {...cRegister("content", { required: true })}
-                  />
-                  <Button type="submit">작성</Button>
-                </Box>
-              </form>
-            </Box>
+            {session.connected ? (
+              <Box sx={{ pt: 3 }}>
+                <form
+                  onSubmit={cHandleSubmit(() => callCommentSaveAPI(postId))}
+                >
+                  <Box sx={{ display: "flex" }}>
+                    <Input
+                      placeholder="댓글을 입력하세요."
+                      inputProps={{ "aria-label": "comment write" }}
+                      fullWidth
+                      {...cRegister("content", { required: true })}
+                    />
+                    <Button type="submit">작성</Button>
+                  </Box>
+                </form>
+              </Box>
+            ) : null}
           </Box>
         </Box>
       )}

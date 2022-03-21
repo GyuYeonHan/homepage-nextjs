@@ -1,9 +1,26 @@
+import { Snackbar } from "@mui/material";
 import { Box } from "@mui/system";
+import { useState } from "react";
+import CustomizedSnackbar from "../components/CustomizedSnackbar";
 
 export default function Home() {
+  const [open, setOpen] = useState(false);
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+
   return (
     <Box>
       <span>홈페이지 입니다.</span>
+      <button onClick={handleClick}>open</button>
+      <CustomizedSnackbar
+        open={open}
+        setOpen={setOpen}
+        handleClick={handleClick}
+        severity="error"
+        message="This is test!"
+      />
     </Box>
   );
 }

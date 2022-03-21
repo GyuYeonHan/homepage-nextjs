@@ -18,7 +18,7 @@ const drawerWidth = 240;
 
 interface Props {
   open: boolean;
-  handleDrawerClose: Function;
+  handleDrawerClose: () => void;
 }
 
 export default function SideBar(props: Props) {
@@ -53,9 +53,10 @@ export default function SideBar(props: Props) {
           variant="persistent"
           anchor="left"
           open={open}
+          onClose={handleDrawerClose}
         >
           <DrawerHeader>
-            <IconButton onClick={() => handleDrawerClose()}>
+            <IconButton onClick={handleDrawerClose}>
               <ChevronLeftIcon />
             </IconButton>
           </DrawerHeader>
@@ -69,7 +70,7 @@ export default function SideBar(props: Props) {
                 <ListItemIcon>
                   {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                 </ListItemIcon>
-                <Link href={item.link}>
+                <Link href={item.link} passHref>
                   <a>
                     <ListItemText primary={item.text} />
                   </a>

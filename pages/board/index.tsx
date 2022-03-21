@@ -1,5 +1,7 @@
 import { Search } from "@mui/icons-material";
 import {
+  Alert,
+  AlertTitle,
   Backdrop,
   Box,
   Button,
@@ -29,6 +31,7 @@ import { useForm } from "react-hook-form";
 import { useQuery, useQueryClient } from "react-query";
 import { BASE_PATH, POST_PATH } from "../../apiCall/base";
 import { fetchAllPostList } from "../../apiCall/post";
+import CustomizedSnackbar from "../../components/CustomizedSnackbar";
 
 export default function Board() {
   const [write, setWrite] = useState(false);
@@ -52,19 +55,13 @@ export default function Board() {
         setWrite(false);
         queryClient.invalidateQueries();
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        if (error.response.status == "401") {
+          console.log("401");
+          setSnackBar(true);
+        }
+      });
   };
-
-  if (isLoading) {
-    return (
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isLoading}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    );
-  }
 
   const savePostForm = (
     <form onSubmit={handleSubmit(callPostSaveAPI)}>
@@ -92,6 +89,20 @@ export default function Board() {
       </ButtonGroup>
     </form>
   );
+
+  // For Snackbar
+  const [openSnackbar, setSnackBar] = useState(false);
+
+  if (isLoading) {
+    return (
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isLoading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    );
+  }
 
   return (
     <Box>
@@ -164,6 +175,12 @@ export default function Board() {
           </Box>
         </Box>
       )}
+      <CustomizedSnackbar
+        open={openSnackbar}
+        setOpen={setSnackBar}
+        severity="error"
+        message="글을 쓸 수 있는 권한이 없습니다."
+      />
     </Box>
   );
 }

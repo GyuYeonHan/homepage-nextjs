@@ -1,6 +1,11 @@
 import { atom } from "recoil";
 
-export const sessionState = atom({
+interface ISession {
+  connected: boolean;
+  username: null | string;
+}
+
+export const sessionState = atom<ISession>({
   key: "session",
-  default: { connected: false, username: "" },
+  default: { connected: false, username: null },
 });

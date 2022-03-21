@@ -11,32 +11,20 @@ import { useRecoilState } from "recoil";
 import { sessionState } from "../atom/session";
 import { useRouter } from "next/router";
 import axios from "axios";
-import { BASE_PATH } from "../apiCall/base";
+import { AUTH_PATH, BASE_PATH } from "../apiCall/base";
 import SideBar from "./SideBar";
-import { Avatar } from "@mui/material";
 import { Person } from "@mui/icons-material";
+import AccountMenu from "./AccountMenu";
+import CustomizedSnackbar from "./CustomizedSnackbar";
 
 export default function ButtonAppBar() {
   const [session, setSession] = useRecoilState(sessionState);
   const router = useRouter();
   axios.defaults.withCredentials = true;
 
-  const callLogoutAPI = () => {
-    axios
-      .post(`${BASE_PATH}/api/auth/logout`)
-      .then((res) => {
-        if (res) {
-          console.log(res);
-          setSession({ connected: false, username: null });
-          router.push("/");
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-
   const getSession = () => {
     axios
-      .get(`${BASE_PATH}/api/auth/session`)
+      .get(`${BASE_PATH}/${AUTH_PATH}/session`)
       .then((res) => {
         console.log(res.data);
         if (res.data.loggedIn) {
@@ -46,44 +34,40 @@ export default function ButtonAppBar() {
       .catch();
   };
 
-  const [open, setOpen] = useState(false);
+  const callLogoutAPI = () => {
+    axios
+      .post(`${BASE_PATH}/${AUTH_PATH}/logout`)
+      .then((res) => {
+        if (res) {
+          setSession({ connected: false, username: null });
+          setOpenSnackbar(true);
+        }
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const [openSideBar, setOpenSideBar] = useState(false);
 
   const handleDrawerOpen = () => {
-    setOpen(true);
+    setOpenSideBar(true);
   };
 
   const handleDrawerClose = () => {
-    setOpen(false);
+    setOpenSideBar(false);
   };
 
-  function stringToColor(string: string) {
-    let hash = 0;
-    let i;
+  // For Account Menu
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const openAccountMenu = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
-    /* eslint-disable no-bitwise */
-    for (i = 0; i < string.length; i += 1) {
-      hash = string.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    let color = "#";
-
-    for (i = 0; i < 3; i += 1) {
-      const value = (hash >> (i * 8)) & 0xff;
-      color += `00${value.toString(16)}`.substr(-2);
-    }
-    /* eslint-enable no-bitwise */
-
-    return color;
-  }
-
-  function stringAvatar(name: string) {
-    return {
-      sx: {
-        bgcolor: stringToColor(name),
-      },
-      children: `${name[0]}`,
-    };
-  }
+  // For Snackbar
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   useEffect(getSession, []);
 
@@ -106,24 +90,41 @@ export default function ButtonAppBar() {
               <a>용석 아카데미</a>
             </Link>
           </Typography>
-          <Avatar {...stringAvatar(session.username)} />
-          <IconButton size="medium" color="inherit">
-            <Person />
-          </IconButton>
-          <Button color="inherit">
-            {session.connected ? (
-              <Link href="/">
-                <a onClick={callLogoutAPI}>로그아웃</a>
-              </Link>
-            ) : (
-              <Link href="/login">
+          {session.connected ? (
+            <>
+              <IconButton size="medium" color="inherit" onClick={handleClick}>
+                <Typography>{session.username}</Typography>
+                <Person />
+              </IconButton>
+              <AccountMenu
+                openAccountMenu={openAccountMenu}
+                handleClose={handleClose}
+                anchorEl={anchorEl}
+                callLogoutAPI={callLogoutAPI}
+                session={session}
+              />
+            </>
+          ) : (
+            <Button color="inherit">
+              <Link
+                href={{
+                  pathname: "/login",
+                  query: { redirectURL: router.pathname },
+                }}
+              >
                 <a>로그인</a>
               </Link>
-            )}
-          </Button>
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
-      <SideBar open={open} handleDrawerClose={handleDrawerClose} />
+      <CustomizedSnackbar
+        open={openSnackbar}
+        setOpen={setOpenSnackbar}
+        severity="info"
+        message="로그아웃 되었습니다."
+      />
+      <SideBar open={openSideBar} handleDrawerClose={handleDrawerClose} />
     </Box>
   );
 }

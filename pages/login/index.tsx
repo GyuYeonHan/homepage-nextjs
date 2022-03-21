@@ -14,7 +14,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
-import { BASE_PATH } from "../../apiCall/base";
+import { AUTH_PATH, BASE_PATH } from "../../apiCall/base";
 import { sessionState } from "../../atom/session";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
@@ -29,16 +29,15 @@ export default function Login() {
   const onValid = () => {
     const data = getValues();
     axios
-      .post(`${BASE_PATH}/api/auth/login`, data)
+      .post(`${BASE_PATH}/${AUTH_PATH}/login`, data)
       .then((res) => {
         if (res) {
           const username = res.data.user.username;
-          setSession(username);
+          setSession({ connected: true, username: username });
         }
       })
       .catch();
-
-    router.push(`/`);
+    router.push(decodeURIComponent(router.query.redirectURL as string));
   };
 
   return (

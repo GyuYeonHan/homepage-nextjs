@@ -26,7 +26,6 @@ export default function ButtonAppBar() {
     axios
       .get(`${BASE_PATH}/${AUTH_PATH}/session`)
       .then((res) => {
-        console.log(res.data);
         if (res.data.loggedIn) {
           setSession({ connected: true, username: res.data.username });
         }

@@ -9,11 +9,10 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { AUTH_PATH, BASE_PATH } from "../../apiCall/base";
 import { sessionState } from "../../atom/session";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -21,23 +20,41 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 export default function Login() {
   const router = useRouter();
   const { register, handleSubmit, getValues } = useForm();
-  const setSession = useSetRecoilState(sessionState);
-  const [error, setError] = useState(false);
+  const [session, setSession] = useRecoilState(sessionState);
+  const [idError, setIdError] = useState(false);
+  const [pwError, setPwError] = useState(false);
 
   axios.defaults.withCredentials = true;
 
   const onValid = () => {
     const data = getValues();
+    const redirectURL = decodeURIComponent(router.query.redirectURL as string);
     axios
       .post(`${BASE_PATH}/${AUTH_PATH}/login`, data)
       .then((res) => {
-        if (res) {
-          const username = res.data.user.username;
-          setSession({ connected: true, username: username });
+        const username = res.data.username;
+        setSession({ connected: true, username: username });
+
+        if (redirectURL === 'undefined') {
+          router.push("/");
+        } else {
+          router.push(redirectURL);
         }
       })
-      .catch();
-    router.push(decodeURIComponent(router.query.redirectURL as string));
+      .catch((error) => {
+        if (error.response.status == "400") {
+          const loginStatus = error.response.data.loginStatus;
+          if (loginStatus === "WRONG_ID") {
+            setIdError(true);
+            setPwError(false);
+          } else if (loginStatus === "WRONG_PASSWORD") {
+            setIdError(false);
+            setPwError(true);
+          }
+        } else {
+          throw error;
+        }
+      });
   };
 
   return (
@@ -70,6 +87,8 @@ export default function Login() {
           name="loginId"
           autoComplete="loginId"
           autoFocus
+          error={idError}
+          helperText={idError ? "아이디가 올바르지 않습니다." : null}
           {...register("loginId", { required: true })}
         />
 
@@ -82,6 +101,8 @@ export default function Login() {
           type="password"
           id="password"
           autoComplete="current-password"
+          error={pwError}
+          helperText={pwError ? "비밀번호가 올바르지 않습니다." : null}
           {...register("password", { required: true })}
         />
         <FormControlLabel

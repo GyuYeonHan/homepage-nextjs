@@ -56,9 +56,11 @@ export default function Board() {
         queryClient.invalidateQueries();
       })
       .catch((error) => {
+        console.log(error.response);
         if (error.response.status == "401") {
-          console.log("401");
-          setSnackBar(true);
+          setOpenSnackbar(true);
+        } else {
+          throw error;
         }
       });
   };
@@ -91,7 +93,7 @@ export default function Board() {
   );
 
   // For Snackbar
-  const [openSnackbar, setSnackBar] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   if (isLoading) {
     return (
@@ -177,7 +179,7 @@ export default function Board() {
       )}
       <CustomizedSnackbar
         open={openSnackbar}
-        setOpen={setSnackBar}
+        setOpen={setOpenSnackbar}
         severity="error"
         message="글을 쓸 수 있는 권한이 없습니다."
       />

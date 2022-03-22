@@ -106,6 +106,10 @@ export default function Post({ postId }: { postId: string }) {
       .catch((error) => console.log(error));
   };
 
+  if (isError) {
+    <div>error</div>;
+  }
+
   if (isLoading) {
     return (
       <Backdrop

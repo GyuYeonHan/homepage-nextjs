@@ -17,16 +17,14 @@ import { styled } from "@mui/material/styles";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { DRAWER_WIDTH } from "./Layout";
 
-interface Props {
+interface MyAppBarProps {
   openSidebar: boolean;
   handleDrawerOpen: () => void;
-  handleDrawerClose: () => void;
 }
 
 interface AppBarProps extends MuiAppBarProps {
   openSidebar?: boolean;
 }
-
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -46,7 +44,7 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 export default function MyAppBar(props) {
-  const { openSidebar, handleDrawerOpen, handleDrawerClose } = props;
+  const { openSidebar, handleDrawerOpen } = props;
   const [session, setSession] = useRecoilState(sessionState);
   const router = useRouter();
 
@@ -92,7 +90,7 @@ export default function MyAppBar(props) {
 
   return (
     <>
-      <AppBar>
+      <AppBar position="fixed">
         <Toolbar>
           <IconButton
             size="large"

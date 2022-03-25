@@ -1,4 +1,4 @@
-import { Backdrop, BadgeProps, CircularProgress } from "@mui/material";
+import { Backdrop, CircularProgress } from "@mui/material";
 
 interface BackdropProps {
   isLoading: boolean;

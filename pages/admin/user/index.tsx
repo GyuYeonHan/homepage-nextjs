@@ -16,7 +16,6 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery, useQueryClient } from "react-query";
@@ -50,7 +49,7 @@ export default function User() {
   };
 
   if (isLoading) {
-    return <MyBackdrop />;
+    <MyBackdrop isLoading={isLoading} />;
   }
 
   return (

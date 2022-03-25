@@ -11,8 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import Link from "next/link";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { styled } from "@mui/material/styles";
-
-const drawerWidth = 240;
+import { DRAWER_WIDTH } from "./Layout";
 
 interface Props {
   open: boolean;
@@ -39,10 +38,10 @@ export default function SideBar(props: Props) {
   return (
     <Drawer
       sx={{
-        width: drawerWidth,
+        width: DRAWER_WIDTH,
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          width: drawerWidth,
+          width: DRAWER_WIDTH,
           boxSizing: "border-box",
         },
       }}

@@ -34,6 +34,7 @@ import { useQuery, useQueryClient } from "react-query";
 import { BASE_PATH, POST_PATH } from "../../apiCall/base";
 import { fetchAllPostList } from "../../apiCall/post";
 import CustomizedSnackbar from "../../components/CustomizedSnackbar";
+import MyBackdrop from "../../components/MyBackdrop";
 
 export default function Board() {
   const [write, setWrite] = useState(false);
@@ -55,6 +56,7 @@ export default function Board() {
           console.log(res);
         }
         setWrite(false);
+
         queryClient.invalidateQueries();
       })
       .catch((error) => {
@@ -97,14 +99,7 @@ export default function Board() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
   if (isLoading) {
-    return (
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isLoading}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    );
+    <MyBackdrop isLoading={isLoading} />;
   }
 
   return (

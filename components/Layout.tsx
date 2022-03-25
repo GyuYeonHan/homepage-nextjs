@@ -1,12 +1,11 @@
 import { Box } from "@mui/material";
-import { styled, createTheme } from "@mui/material/styles";
-import { ThemeProvider } from "@mui/styles";
+import { styled } from "@mui/material/styles";
 import { useRecoilState } from "recoil";
 import { openSidebarState } from "../atom/sidebar";
 import MyAppBar from "./MyAppBar";
 import SideBar from "./SideBar";
 
-const drawerWidth = 240;
+export const DRAWER_WIDTH = 240;
 
 const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open",
@@ -25,12 +24,11 @@ const Main = styled("main", {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    marginLeft: `${drawerWidth}px`,
+    marginLeft: `${DRAWER_WIDTH}px`,
   }),
 }));
 
 export default function Layout({ children }) {
-  const theme = createTheme({});
   const [openSidebar, setOpenSidebar] = useRecoilState(openSidebarState);
 
   const handleDrawerClose = () => {
@@ -38,12 +36,10 @@ export default function Layout({ children }) {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <MyAppBar
-        position="fixed"
         open={openSidebar}
         handleDrawerOpen={() => setOpenSidebar(true)}
-        handleDrawerClose={handleDrawerClose}
       />
       <SideBar open={openSidebar} handleDrawerClose={handleDrawerClose} />
       {/* <Container maxWidth="xs"> */}
@@ -61,6 +57,6 @@ export default function Layout({ children }) {
         </Box>
       </Main>
       {/* </Container> */}
-    </ThemeProvider>
+    </>
   );
 }

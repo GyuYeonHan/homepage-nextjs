@@ -23,6 +23,7 @@ import ListIcon from "@mui/icons-material/List";
 import { Box } from "@mui/system";
 import { useRecoilState } from "recoil";
 import { sessionState } from "../../atom/session";
+import MyBackdrop from "../../components/MyBackdrop";
 
 export default function Post({ postId }: { postId: string }) {
   const router = useRouter();
@@ -111,14 +112,7 @@ export default function Post({ postId }: { postId: string }) {
   }
 
   if (isLoading) {
-    return (
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isLoading}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    );
+    <MyBackdrop isLoading={isLoading} />;
   }
 
   const editPostForm = (

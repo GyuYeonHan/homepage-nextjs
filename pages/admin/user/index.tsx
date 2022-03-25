@@ -22,6 +22,7 @@ import { useForm } from "react-hook-form";
 import { useQuery, useQueryClient } from "react-query";
 import { BASE_PATH, USER_PATH } from "../../../apiCall/base";
 import { fetchAllUserList } from "../../../apiCall/user";
+import MyBackdrop from "../../../components/MyBackdrop";
 
 export default function User() {
   const [write, setWrite] = useState(false);
@@ -49,7 +50,7 @@ export default function User() {
   };
 
   if (isLoading) {
-    return <span>Loading...</span>;
+    return <MyBackdrop />;
   }
 
   return (

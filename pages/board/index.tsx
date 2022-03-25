@@ -24,6 +24,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { ThemeProvider } from "@mui/styles";
+import { createTheme } from "@mui/material";
 import axios from "axios";
 import Link from "next/link";
 import { useState } from "react";
@@ -56,7 +58,6 @@ export default function Board() {
         queryClient.invalidateQueries();
       })
       .catch((error) => {
-        console.log(error.response);
         if (error.response.status == "401") {
           setOpenSnackbar(true);
         } else {
@@ -108,8 +109,12 @@ export default function Board() {
 
   return (
     <Box>
-      <Typography component="h2" variant="h2">
-        게시판
+      <Typography
+        component="h2"
+        variant="h2"
+        style={{ fontWeight: 600, color: "#3a75cb" }}
+      >
+        Board
       </Typography>
       {write ? (
         <Box sx={{ width: 1 }}>{savePostForm}</Box>

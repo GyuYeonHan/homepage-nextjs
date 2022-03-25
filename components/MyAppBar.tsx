@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -12,14 +10,46 @@ import { sessionState } from "../atom/session";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { AUTH_PATH, BASE_PATH } from "../apiCall/base";
-import SideBar from "./SideBar";
 import { Person } from "@mui/icons-material";
 import AccountMenu from "./AccountMenu";
 import CustomizedSnackbar from "./CustomizedSnackbar";
+import { styled } from "@mui/material/styles";
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+import { DRAWER_WIDTH } from "./Layout";
 
-export default function ButtonAppBar() {
+interface Props {
+  openSidebar: boolean;
+  handleDrawerOpen: () => void;
+  handleDrawerClose: () => void;
+}
+
+interface AppBarProps extends MuiAppBarProps {
+  openSidebar?: boolean;
+}
+
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})<AppBarProps>(({ theme, openSidebar }) => ({
+  transition: theme.transitions.create(["margin", "width"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(openSidebar && {
+    width: `calc(100% - ${DRAWER_WIDTH}px)`,
+    marginLeft: `${DRAWER_WIDTH}px`,
+    transition: theme.transitions.create(["margin", "width"], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+export default function MyAppBar(props) {
+  const { openSidebar, handleDrawerOpen, handleDrawerClose } = props;
   const [session, setSession] = useRecoilState(sessionState);
   const router = useRouter();
+
   axios.defaults.withCredentials = true;
 
   const getSession = () => {
@@ -45,16 +75,6 @@ export default function ButtonAppBar() {
       .catch((error) => console.log(error));
   };
 
-  const [openSideBar, setOpenSideBar] = useState(false);
-
-  const handleDrawerOpen = () => {
-    setOpenSideBar(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpenSideBar(false);
-  };
-
   // For Account Menu
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openAccountMenu = Boolean(anchorEl);
@@ -71,8 +91,8 @@ export default function ButtonAppBar() {
   useEffect(getSession, []);
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed">
+    <>
+      <AppBar>
         <Toolbar>
           <IconButton
             size="large"
@@ -80,19 +100,19 @@ export default function ButtonAppBar() {
             color="inherit"
             aria-label="menu"
             onClick={handleDrawerOpen}
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, ...(openSidebar && { display: "inline" }) }}
           >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             <Link href="/">
-              <a>용석 아카데미</a>
+              <a>YongSeok Academy</a>
             </Link>
           </Typography>
           {session.connected ? (
             <>
-              <IconButton size="medium" color="inherit" onClick={handleClick}>
-                <Typography>{session.username}</Typography>
+              <IconButton size="large" color="inherit" onClick={handleClick}>
+                {/* <Typography>{session.username}</Typography> */}
                 <Person />
               </IconButton>
               <AccountMenu
@@ -111,7 +131,7 @@ export default function ButtonAppBar() {
                   query: { redirectURL: router.pathname },
                 }}
               >
-                <a>로그인</a>
+                <a>Sign In</a>
               </Link>
             </Button>
           )}
@@ -123,7 +143,6 @@ export default function ButtonAppBar() {
         severity="info"
         message="로그아웃 되었습니다."
       />
-      <SideBar open={openSideBar} handleDrawerClose={handleDrawerClose} />
-    </Box>
+    </>
   );
 }

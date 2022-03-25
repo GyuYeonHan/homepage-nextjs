@@ -86,8 +86,6 @@ export default function MyAppBar(props) {
   // For Snackbar
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
-  useEffect(getSession, []);
-
   return (
     <>
       <AppBar position="fixed">

@@ -49,7 +49,7 @@ export default function User() {
   };
 
   if (isLoading) {
-    <MyBackdrop isLoading={isLoading} />;
+    return <MyBackdrop isLoading={isLoading} />;
   }
 
   return (

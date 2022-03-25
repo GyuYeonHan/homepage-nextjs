@@ -3,8 +3,6 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function Admin() {
-  const [value, setValue] = useState(0);
-
   return (
     <Box>
       <Typography component="h2" variant="h2">

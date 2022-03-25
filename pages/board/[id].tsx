@@ -7,10 +7,8 @@ import { useQuery, useQueryClient } from "react-query";
 import { BASE_PATH, COMMENT_PATH, POST_PATH } from "../../apiCall/base";
 import { fetchPost } from "../../apiCall/post";
 import {
-  Backdrop,
   Button,
   ButtonGroup,
-  CircularProgress,
   Divider,
   IconButton,
   Input,
@@ -112,7 +110,7 @@ export default function Post({ postId }: { postId: string }) {
   }
 
   if (isLoading) {
-    <MyBackdrop isLoading={isLoading} />;
+    return <MyBackdrop isLoading={isLoading} />;
   }
 
   const editPostForm = (

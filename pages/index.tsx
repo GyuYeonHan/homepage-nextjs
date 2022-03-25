@@ -1,4 +1,3 @@
-import { Snackbar } from "@mui/material";
 import { Box } from "@mui/system";
 import { useState } from "react";
 import { BASE_PATH } from "../apiCall/base";
@@ -10,6 +9,8 @@ export default function Home() {
   const handleClick = () => {
     setOpen(true);
   };
+
+  // console.log(BASE_PATH);
 
   return (
     <Box>

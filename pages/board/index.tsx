@@ -1,18 +1,11 @@
 import { Search } from "@mui/icons-material";
 import {
-  Alert,
-  AlertTitle,
-  Backdrop,
   Box,
   Button,
   ButtonGroup,
-  CircularProgress,
-  Container,
-  Divider,
   IconButton,
   Input,
   InputAdornment,
-  InputBase,
   Pagination,
   Paper,
   Table,
@@ -24,8 +17,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { ThemeProvider } from "@mui/styles";
-import { createTheme } from "@mui/material";
 import axios from "axios";
 import Link from "next/link";
 import { useState } from "react";
@@ -99,7 +90,7 @@ export default function Board() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
   if (isLoading) {
-    <MyBackdrop isLoading={isLoading} />;
+    return <MyBackdrop isLoading={isLoading} />;
   }
 
   return (

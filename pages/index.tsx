@@ -1,6 +1,7 @@
 import { Snackbar } from "@mui/material";
 import { Box } from "@mui/system";
 import { useState } from "react";
+import { BASE_PATH, test } from "../apiCall/base";
 import CustomizedSnackbar from "../components/CustomizedSnackbar";
 
 export default function Home() {

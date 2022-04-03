@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRecoilState } from "recoil";
 import { AUTH_PATH, BASE_PATH } from "../../apiCall/base";
@@ -26,16 +26,31 @@ export default function Login() {
 
   axios.defaults.withCredentials = true;
 
+  useEffect(() => {
+    const redirectURL = decodeURIComponent(router.query.redirectURL as string);
+
+    if (session.userId != "-1") {
+      if (redirectURL === "undefined") {
+        router.push("/");
+      } else {
+        router.push(redirectURL);
+      }
+    }
+  }, []);
+
   const onValid = () => {
     const data = getValues();
     const redirectURL = decodeURIComponent(router.query.redirectURL as string);
     axios
       .post(`${BASE_PATH}/${AUTH_PATH}/login`, data)
       .then((res) => {
-        const username = res.data.username;
-        setSession({ connected: true, username: username });
+        setSession({
+          connected: true,
+          username: null,
+          userId: "-1",
+        });
 
-        if (redirectURL === 'undefined') {
+        if (redirectURL === "undefined") {
           router.push("/");
         } else {
           router.push(redirectURL);
@@ -105,10 +120,10 @@ export default function Login() {
           helperText={pwError ? "비밀번호가 올바르지 않습니다." : null}
           {...register("password", { required: true })}
         />
-        <FormControlLabel
+        {/* <FormControlLabel
           control={<Checkbox value="remember" color="primary" />}
           label="로그인 정보 유지"
-        />
+        /> */}
         <Button
           type="submit"
           fullWidth

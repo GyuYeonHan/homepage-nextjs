@@ -3,11 +3,14 @@ import {
   Box,
   Button,
   ButtonGroup,
+  FormControl,
   IconButton,
   Input,
   InputAdornment,
+  MenuItem,
   Pagination,
   Paper,
+  Select,
   Table,
   TableBody,
   TableCell,
@@ -19,7 +22,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery, useQueryClient } from "react-query";
 import { BASE_PATH, POST_PATH } from "../../apiCall/base";
@@ -27,10 +30,21 @@ import { fetchAllPostList } from "../../apiCall/post";
 import CustomizedSnackbar from "../../components/CustomizedSnackbar";
 import MyBackdrop from "../../components/MyBackdrop";
 
+interface IPost {
+  id: number;
+  title: string;
+  content: string;
+  username: string;
+  modifiedDate: string;
+}
+
 export default function Board() {
   const [write, setWrite] = useState(false);
-  const { register, handleSubmit, getValues } = useForm();
-  const { isLoading, isError, data, error } = useQuery(
+  const [searchValueHolder, setSearchValueHolder] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+  const [searchCategory, setSearchCategory] = useState("title");
+  const { register, handleSubmit, getValues, setValue } = useForm();
+  const { isLoading, isError, isSuccess, data } = useQuery<IPost[]>(
     "AllpostList",
     fetchAllPostList
   );
@@ -47,6 +61,8 @@ export default function Board() {
           console.log(res);
         }
         setWrite(false);
+        setValue("title", "");
+        setValue("content", "");
 
         queryClient.invalidateQueries();
       })
@@ -57,6 +73,33 @@ export default function Board() {
           throw error;
         }
       });
+  };
+
+  // For Snackbar
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
+  const writeModeOn = () => {
+    setWrite(true);
+  };
+
+  const writeModeOff = () => {
+    setWrite(false);
+    setValue("title", "");
+    setValue("content", "");
+  };
+
+  // For Search Post
+  const searchPost = (
+    post: IPost,
+    condition: string,
+    searchValue: string
+  ): boolean => {
+    if (condition == "title") {
+      return post.title.includes(searchValue);
+    } else if (condition == "username") {
+      return post.username.includes(searchValue);
+    }
+    return false;
   };
 
   const savePostForm = (
@@ -81,13 +124,10 @@ export default function Board() {
       </Box>
       <ButtonGroup variant="contained">
         <Button type="submit">작성</Button>
-        <Button onClick={() => setWrite(false)}>취소</Button>
+        <Button onClick={writeModeOff}>취소</Button>
       </ButtonGroup>
     </form>
   );
-
-  // For Snackbar
-  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   if (isLoading) {
     return <MyBackdrop isLoading={isLoading} />;
@@ -98,21 +138,56 @@ export default function Board() {
       <Typography
         component="h2"
         variant="h2"
-        style={{ fontWeight: 600, color: "#3a75cb" }}
+        style={{ fontWeight: 600, color: "#AF8666" }}
       >
         Board
       </Typography>
       {write ? (
-        <Box sx={{ width: 1 }}>{savePostForm}</Box>
+        <Box>{savePostForm}</Box>
       ) : (
         <Box>
-          <Button
-            variant="text"
-            onClick={() => setWrite(true)}
-            sx={{ float: "right" }}
-          >
-            새 글 쓰기
-          </Button>
+          <Box>
+            <Button
+              variant="text"
+              onClick={writeModeOn}
+              sx={{ float: "left", color: "#AF8666" }}
+            >
+              새 글 쓰기
+            </Button>
+            <Box sx={{ float: "right" }}>
+              <Select
+                id="post-search-value"
+                defaultValue="title"
+                value={searchCategory}
+                onChange={(e) => setSearchCategory(e.target.value)}
+                sx={{ height: 30, mr: 1 }}
+              >
+                <MenuItem value="title">제목</MenuItem>
+                <MenuItem value="username">작성자</MenuItem>
+              </Select>
+              <Input
+                placeholder="Search…"
+                value={searchValueHolder}
+                onChange={(e) => {
+                  setSearchValueHolder(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter") {
+                    setSearchValue(searchValueHolder);
+                  }
+                }}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setSearchValue(searchValueHolder)}
+                    >
+                      <Search />
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </Box>
+          </Box>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 300 }} aria-label="simple table">
               <TableHead>
@@ -124,23 +199,29 @@ export default function Board() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data.map((post) => (
-                  <TableRow
-                    key={post.id}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="row" align="center">
-                      {post.id}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Link href={`/board/${post.id}`}>
-                        <a>{post.title}</a>
-                      </Link>
-                    </TableCell>
-                    <TableCell align="center">{post.username}</TableCell>
-                    <TableCell align="center">{post.modifiedDate}</TableCell>
-                  </TableRow>
-                ))}
+                {data
+                  .filter(
+                    (post) =>
+                      searchValue == "" ||
+                      searchPost(post, searchCategory, searchValue)
+                  )
+                  .map((post) => (
+                    <TableRow
+                      key={post.id}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row" align="center">
+                        {post.id}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Link href={`/board/${post.id}`}>
+                          <a>{post.title}</a>
+                        </Link>
+                      </TableCell>
+                      <TableCell align="center">{post.username}</TableCell>
+                      <TableCell align="center">{post.modifiedDate}</TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -152,19 +233,6 @@ export default function Board() {
             }}
           >
             <Pagination count={10} />
-          </Box>
-          <Box sx={{ mt: 2 }}>
-            <Input
-              placeholder="Search…"
-              fullWidth
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton>
-                    <Search />
-                  </IconButton>
-                </InputAdornment>
-              }
-            />
           </Box>
         </Box>
       )}

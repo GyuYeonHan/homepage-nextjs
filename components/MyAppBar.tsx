@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
+import NotificationsNone from "@mui/icons-material/NotificationsNone";
 import Link from "next/link";
 import { useRecoilState } from "recoil";
 import { sessionState } from "../atom/session";
@@ -16,25 +17,32 @@ import CustomizedSnackbar from "./CustomizedSnackbar";
 import { styled } from "@mui/material/styles";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { DRAWER_WIDTH } from "./Layout";
+import MyNoticeMenu, { INotice } from "./MyNoticeMenu";
+import { fetchUnreadNoticeOfUser } from "../apiCall/notice";
+import { useQuery } from "react-query";
+import { Badge, Skeleton } from "@mui/material";
 
 interface MyAppBarProps {
-  openSidebar: boolean;
+  open: boolean;
   handleDrawerOpen: () => void;
 }
 
 interface AppBarProps extends MuiAppBarProps {
-  openSidebar?: boolean;
+  open?: boolean;
 }
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
-})<AppBarProps>(({ theme, openSidebar }) => ({
+})<AppBarProps>(({ theme, open }) => ({
+  backgroundColor: "#AF8666",
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  ...(openSidebar && {
-    width: `calc(100% + ${DRAWER_WIDTH}px)`,
+
+  marginLeft: `400px`,
+  ...(open && {
+    width: `calc(100% - ${DRAWER_WIDTH}px)`,
     marginLeft: `${DRAWER_WIDTH}px`,
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
@@ -43,8 +51,8 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-export default function MyAppBar(props) {
-  const { openSidebar, handleDrawerOpen } = props;
+export default function MyAppBar(props: MyAppBarProps) {
+  const { open, handleDrawerOpen } = props;
   const [session, setSession] = useRecoilState(sessionState);
   const router = useRouter();
 
@@ -54,8 +62,13 @@ export default function MyAppBar(props) {
     axios
       .get(`${BASE_PATH}/${AUTH_PATH}/session`)
       .then((res) => {
-        if (res.data.loggedIn) {
-          setSession({ connected: true, username: res.data.username });
+        if (res.data.loggedIn && session.userId == "-1") {
+          setSession({
+            connected: true,
+            userId: res.data.userId,
+            username: res.data.username,
+          });
+          refetch();
         }
       })
       .catch();
@@ -66,29 +79,51 @@ export default function MyAppBar(props) {
       .post(`${BASE_PATH}/${AUTH_PATH}/logout`)
       .then((res) => {
         if (res) {
-          setSession({ connected: false, username: null });
-          setOpenSnackbar(true);
+          setSession({ connected: false, username: null, userId: null });
+          setOpenLogoutSnackbar(true);
         }
       })
       .catch((error) => console.log(error));
   };
 
+  const { data, isError, error, refetch } = useQuery<INotice[]>(
+    "UnreadNoticeList",
+    () => fetchUnreadNoticeOfUser(session.userId),
+    { enabled: false }
+  );
+
   // For Account Menu
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openAccountMenu = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleAccountMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
+  const handleAccountMenuClose = () => {
     setAnchorEl(null);
   };
 
+  // For Notice Menu
+  const [openNoticeMenu, setOpenNoticeMenu] = useState<boolean>(false);
+  const [noticeList, setNoticeList] = useState<INotice[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const anchorRef = useRef<HTMLButtonElement>(null);
+
   // For Snackbar
-  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [openLogoutSnackbar, setOpenLogoutSnackbar] = useState(false);
+  const [openLoginSnackbar, setOpenLoginSnackbar] = useState(false);
+
+  useEffect(getSession, []);
+  useEffect(getSession, [session]);
+  useEffect(() => {
+    if (data !== undefined) {
+      setNoticeList(data);
+      setIsLoading(false);
+    }
+  }, [data]);
 
   return (
     <>
-      <AppBar position="fixed">
+      <AppBar position="fixed" open={open}>
         <Toolbar>
           <IconButton
             size="large"
@@ -96,24 +131,51 @@ export default function MyAppBar(props) {
             color="inherit"
             aria-label="menu"
             onClick={handleDrawerOpen}
-            sx={{ mr: 2, ...(openSidebar && { display: "inline" }) }}
+            sx={{ mr: 2, ...(open && { display: "none" }) }}
           >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             <Link href="/">
-              <a>YongSeok Academy</a>
+              <a>YS Academy</a>
             </Link>
           </Typography>
           {session.connected ? (
             <>
-              <IconButton size="large" color="inherit" onClick={handleClick}>
-                {/* <Typography>{session.username}</Typography> */}
+              {isLoading ? (
+                <Skeleton variant="circular" width={40} height={40} />
+              ) : (
+                <>
+                  <IconButton
+                    size="large"
+                    color="inherit"
+                    onClick={() => {
+                      setOpenNoticeMenu((prevOpen) => !prevOpen);
+                    }}
+                    ref={anchorRef}
+                  >
+                    <Badge badgeContent={noticeList.length} color="primary">
+                      <NotificationsNone />
+                    </Badge>
+                  </IconButton>
+                  <MyNoticeMenu
+                    open={openNoticeMenu}
+                    setOpen={setOpenNoticeMenu}
+                    anchorRef={anchorRef}
+                    noticeList={noticeList}
+                  />
+                </>
+              )}
+              <IconButton
+                size="large"
+                color="inherit"
+                onClick={handleAccountMenuClick}
+              >
                 <Person />
               </IconButton>
               <AccountMenu
                 openAccountMenu={openAccountMenu}
-                handleClose={handleClose}
+                handleClose={handleAccountMenuClose}
                 anchorEl={anchorEl}
                 callLogoutAPI={callLogoutAPI}
                 session={session}
@@ -134,8 +196,14 @@ export default function MyAppBar(props) {
         </Toolbar>
       </AppBar>
       <CustomizedSnackbar
-        open={openSnackbar}
-        setOpen={setOpenSnackbar}
+        open={openLoginSnackbar}
+        setOpen={setOpenLoginSnackbar}
+        severity="info"
+        message="로그인 되었습니다."
+      />
+      <CustomizedSnackbar
+        open={openLogoutSnackbar}
+        setOpen={setOpenLogoutSnackbar}
         severity="info"
         message="로그아웃 되었습니다."
       />

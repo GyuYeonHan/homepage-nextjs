@@ -25,7 +25,7 @@ function MyApp({ Component, pageProps }) {
           </Layout>
         </ThemeProvider>
       </RecoilRoot>
-      <ReactQueryDevtools initialIsOpen={true} />
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

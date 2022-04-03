@@ -33,6 +33,7 @@ export default function Post({ postId }: { postId: string }) {
     register: pRegister,
     handleSubmit: pHandleSubmit,
     getValues: pGetValues,
+    setValue: pSetValue,
   } = useForm();
 
   const {
@@ -45,10 +46,6 @@ export default function Post({ postId }: { postId: string }) {
   const { isLoading, isError, isSuccess, data, error } = useQuery("post", () =>
     fetchPost(postId)
   );
-
-  const toBoardHome = () => {
-    router.push(`/board`);
-  };
 
   axios.defaults.withCredentials = true;
 
@@ -78,7 +75,7 @@ export default function Post({ postId }: { postId: string }) {
       .catch((error) => console.log(error));
   };
 
-  const callCommentSaveAPI = (postId) => {
+  const callCommentSaveAPI = (postId: string) => {
     const formData = cGetValues();
     console.log(formData);
     axios
@@ -106,7 +103,7 @@ export default function Post({ postId }: { postId: string }) {
   };
 
   if (isError) {
-    <div>error</div>;
+    return <div>error</div>;
   }
 
   if (isLoading) {
@@ -137,15 +134,27 @@ export default function Post({ postId }: { postId: string }) {
       </Box>
       <ButtonGroup variant="contained">
         <Button type="submit">수정</Button>
-        <Button onClick={() => setEdit(false)}>취소</Button>
+        <Button
+          onClick={() => {
+            setEdit(false);
+            pSetValue("title", data.post.title);
+            pSetValue("content", data.post.content);
+          }}
+        >
+          취소
+        </Button>
       </ButtonGroup>
     </form>
   );
 
   return (
     <Box>
-      <Typography component="h2" variant="h2">
-        게시판
+      <Typography
+        component="h2"
+        variant="h2"
+        style={{ fontWeight: 600, color: "#AF8666" }}
+      >
+        Board
       </Typography>
       {edit ? (
         <Box>{editPostForm}</Box>
@@ -167,7 +176,12 @@ export default function Post({ postId }: { postId: string }) {
                 float: "right",
               }}
             >
-              <Button startIcon={<ListIcon />} onClick={toBoardHome}>
+              <Button
+                startIcon={<ListIcon />}
+                onClick={() => {
+                  router.push(`/board`);
+                }}
+              >
                 목록
               </Button>
               {session.username === data.post.username ? (
@@ -191,10 +205,10 @@ export default function Post({ postId }: { postId: string }) {
               {data.commentList.map((comment) => (
                 <Box key={comment.id} sx={{ mb: 2 }}>
                   <Typography variant="h6" component="span">
-                    {comment.username}{" "}
+                    {comment.username}
                   </Typography>
                   <Typography component="span">
-                    {comment.modifiedDate}{" "}
+                    {comment.modifiedDate}
                   </Typography>
                   <Box>
                     <Typography component="span">{comment.content} </Typography>

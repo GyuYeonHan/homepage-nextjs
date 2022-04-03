@@ -136,7 +136,7 @@ export default function User() {
                       {user.id}
                     </TableCell>
                     <TableCell align="center">
-                      <Link href={`/user/${user.id}`}>
+                      <Link href={`/admin/user/${user.id}`}>
                         <a>{user.username}</a>
                       </Link>
                     </TableCell>

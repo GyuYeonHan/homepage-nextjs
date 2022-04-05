@@ -59,17 +59,6 @@ export default function MyNoticeMenu(props: MenuProps) {
     setOpen(false);
   };
 
-  const handleClick = (url: string) => {
-    axios
-      .put(`${BASE_PATH}/${NOTICE_PATH}`)
-      .then((res) => {
-        router.push(url);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   // return focus to the button when we transitioned from !open -> open
   const prevOpen = React.useRef(open);
   React.useEffect(() => {

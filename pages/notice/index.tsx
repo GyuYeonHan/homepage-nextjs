@@ -19,7 +19,7 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import { BASE_PATH, NOTICE_PATH } from "../../apiCall/base";
 import axios from "axios";
 
-export default function notice() {
+export default function Notice() {
   const router = useRouter();
   const session = useRecoilValue(sessionState);
   const [isLoading, setIsLoading] = useState<boolean>(true);

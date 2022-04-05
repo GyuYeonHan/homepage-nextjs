@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRecoilState } from "recoil";
 import { AUTH_PATH, BASE_PATH } from "../../apiCall/base";
-import { sessionState } from "../../atom/session";
+import { sessionState, SESSION_STATUS } from "../../atom/session";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 export default function Login() {
@@ -29,7 +29,7 @@ export default function Login() {
   useEffect(() => {
     const redirectURL = decodeURIComponent(router.query.redirectURL as string);
 
-    if (session.userId != "-1") {
+    if (session.status === SESSION_STATUS.CONNECTED) {
       if (redirectURL === "undefined") {
         router.push("/");
       } else {
@@ -38,22 +38,30 @@ export default function Login() {
     }
   }, []);
 
+  interface Ilogin {
+    loginStatus: "LOGIN_SUCCESS" | "WRONG_ID" | "WRONG_PASSWORD";
+    userId: string;
+    username: string;
+  }
+
   const onValid = () => {
     const data = getValues();
     const redirectURL = decodeURIComponent(router.query.redirectURL as string);
     axios
       .post(`${BASE_PATH}/${AUTH_PATH}/login`, data)
       .then((res) => {
-        setSession({
-          connected: true,
-          username: null,
-          userId: "-1",
-        });
+        if (res.data.loginStatus === "LOGIN_SUCCESS") {
+          setSession({
+            status: SESSION_STATUS.PRECONNECTED,
+            username: res.data.username,
+            userId: res.data.userId,
+          });
 
-        if (redirectURL === "undefined") {
-          router.push("/");
-        } else {
-          router.push(redirectURL);
+          if (redirectURL === "undefined") {
+            router.push("/");
+          } else {
+            router.push(redirectURL);
+          }
         }
       })
       .catch((error) => {

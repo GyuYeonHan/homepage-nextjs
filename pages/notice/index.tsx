@@ -1,5 +1,6 @@
 import {
   Box,
+  Divider,
   List,
   ListItem,
   ListItemIcon,
@@ -11,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useRecoilValue } from "recoil";
 import { fetchAllNoticeOfUser } from "../../apiCall/notice";
-import { sessionState } from "../../atom/session";
+import { sessionState, SESSION_STATUS } from "../../atom/session";
 import MyBackdrop from "../../components/MyBackdrop";
 import { INotice } from "../../components/MyNoticeMenu";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
@@ -33,16 +34,16 @@ export default function notice() {
     axios
       .patch(`${BASE_PATH}/${NOTICE_PATH}/${notice.id}`)
       .then((res) => {
-        console.log(res);
         router.push(notice.url);
       })
       .catch((error) => {});
   };
 
+  console.log(session);
+
   useEffect(() => {
-    if (session.userId == "-1") {
-      console.log("you have to go");
-      //   router.push("/login");
+    if (session.status === SESSION_STATUS.NOSESSION) {
+      router.push("/login");
     }
   }, []);
 
@@ -55,6 +56,13 @@ export default function notice() {
 
   if (isLoading) {
     return <MyBackdrop isLoading={isLoading} />;
+  }
+
+  if (isError) {
+    console.log(error);
+    // if (error.response.status == "404") {
+    return <div>error</div>;
+    // }
   }
 
   return (
@@ -84,6 +92,7 @@ export default function notice() {
               </ListItemIcon>
               <ListItemText>{notice.message}</ListItemText>
               <ListItemText>{notice.createdDate}</ListItemText>
+              <Divider />
             </ListItem>
           ))}
         </List>

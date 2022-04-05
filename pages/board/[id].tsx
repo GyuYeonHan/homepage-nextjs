@@ -20,7 +20,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ListIcon from "@mui/icons-material/List";
 import { Box } from "@mui/system";
 import { useRecoilState } from "recoil";
-import { sessionState } from "../../atom/session";
+import { sessionState, SESSION_STATUS } from "../../atom/session";
 import MyBackdrop from "../../components/MyBackdrop";
 
 export default function Post({ postId }: { postId: string }) {
@@ -77,7 +77,6 @@ export default function Post({ postId }: { postId: string }) {
 
   const callCommentSaveAPI = (postId: string) => {
     const formData = cGetValues();
-    console.log(formData);
     axios
       .post(`${BASE_PATH}/${COMMENT_PATH}/post/${postId}`, formData)
       .then((res) => {
@@ -222,7 +221,7 @@ export default function Post({ postId }: { postId: string }) {
                 </Box>
               ))}
             </Box>
-            {session.connected ? (
+            {session.status === SESSION_STATUS.CONNECTED ? (
               <Box sx={{ pt: 3 }}>
                 <form
                   onSubmit={cHandleSubmit(() => callCommentSaveAPI(postId))}

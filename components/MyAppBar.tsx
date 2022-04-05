@@ -7,7 +7,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsNone from "@mui/icons-material/NotificationsNone";
 import Link from "next/link";
 import { useRecoilState } from "recoil";
-import { sessionState } from "../atom/session";
+import { sessionState, SESSION_STATUS } from "../atom/session";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { AUTH_PATH, BASE_PATH } from "../apiCall/base";
@@ -62,13 +62,46 @@ export default function MyAppBar(props: MyAppBarProps) {
     axios
       .get(`${BASE_PATH}/${AUTH_PATH}/session`)
       .then((res) => {
-        if (res.data.loggedIn && session.userId == "-1") {
+        // console.log(res, session);
+        if (session.status == SESSION_STATUS.INITIAL) {
+          if (res.data.loggedIn) {
+            setSession({
+              status: SESSION_STATUS.CONNECTED,
+              userId: res.data.userId,
+              username: res.data.username,
+            });
+            refetch();
+          } else {
+            setSession({
+              status: SESSION_STATUS.NOSESSION,
+              userId: null,
+              username: null,
+            });
+          }
+        } else if (session.status == SESSION_STATUS.NOSESSION) {
+          if (res.data.loggedIn) {
+            setSession({
+              status: SESSION_STATUS.CONNECTED,
+              userId: res.data.userId,
+              username: res.data.username,
+            });
+            refetch();
+          }
+        } else if (session.status == SESSION_STATUS.PRECONNECTED) {
           setSession({
-            connected: true,
+            status: SESSION_STATUS.CONNECTED,
             userId: res.data.userId,
             username: res.data.username,
           });
           refetch();
+        } else {
+          if (!res.data.loggedIn) {
+            setSession({
+              status: SESSION_STATUS.NOSESSION,
+              userId: null,
+              username: null,
+            });
+          }
         }
       })
       .catch();
@@ -79,7 +112,11 @@ export default function MyAppBar(props: MyAppBarProps) {
       .post(`${BASE_PATH}/${AUTH_PATH}/logout`)
       .then((res) => {
         if (res) {
-          setSession({ connected: false, username: null, userId: null });
+          setSession({
+            status: SESSION_STATUS.NOSESSION,
+            username: null,
+            userId: null,
+          });
           setOpenLogoutSnackbar(true);
         }
       })
@@ -140,7 +177,7 @@ export default function MyAppBar(props: MyAppBarProps) {
               <a>YS Academy</a>
             </Link>
           </Typography>
-          {session.connected ? (
+          {session.status === SESSION_STATUS.CONNECTED ? (
             <>
               {isLoading ? (
                 <Skeleton variant="circular" width={40} height={40} />

@@ -1,12 +1,18 @@
 import { atom } from "recoil";
 
+export enum SESSION_STATUS {
+  INITIAL,
+  NOSESSION,
+  CONNECTED,
+}
+
 interface ISession {
-  connected: boolean;
+  status: SESSION_STATUS;
   username: null | string;
   userId: null | string;
 }
 
 export const sessionState = atom<ISession>({
   key: "session",
-  default: { connected: false, username: null, userId: "-1" },
+  default: { status: SESSION_STATUS.INITIAL, username: null, userId: "-1" },
 });

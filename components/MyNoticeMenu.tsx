@@ -39,6 +39,15 @@ export default function MyNoticeMenu(props: MenuProps) {
   const { open, setOpen, anchorRef, noticeList } = props;
   const router = useRouter();
 
+  const readNotice = (notice: INotice) => {
+    axios
+      .patch(`${BASE_PATH}/${NOTICE_PATH}/${notice.id}`)
+      .then((res) => {
+        router.push(notice.url);
+      })
+      .catch((error) => {});
+  };
+
   const handleClose = (event: Event | React.SyntheticEvent) => {
     if (
       anchorRef.current &&
@@ -95,7 +104,13 @@ export default function MyNoticeMenu(props: MenuProps) {
                 // onKeyDown={3}
               >
                 {noticeList.slice(0, 8).map((notice: INotice) => (
-                  <MenuItem key={notice.id} onClick={handleClose}>
+                  <MenuItem
+                    key={notice.id}
+                    onClick={(e) => {
+                      readNotice(notice);
+                      handleClose(e);
+                    }}
+                  >
                     <NoticeItem notice={notice} />
                   </MenuItem>
                 ))}

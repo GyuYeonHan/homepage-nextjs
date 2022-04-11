@@ -26,7 +26,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery, useQueryClient } from "react-query";
 import { BASE_PATH, POST_PATH } from "../../apiCall/base";
-import { fetchAllPostList } from "../../apiCall/post";
+import { fetchAllQuestionPostList } from "../../apiCall/post";
 import CustomizedSnackbar from "../../components/CustomizedSnackbar";
 import MyBackdrop from "../../components/MyBackdrop";
 
@@ -45,17 +45,17 @@ export default function Board() {
   const [searchCategory, setSearchCategory] = useState("title");
   const { register, handleSubmit, getValues, setValue } = useForm();
   const { isLoading, isError, isSuccess, data } = useQuery<IPost[]>(
-    "AllpostList",
-    fetchAllPostList
+    "AllQuestionPostList",
+    fetchAllQuestionPostList
   );
   const queryClient = useQueryClient();
 
   axios.defaults.withCredentials = true;
 
-  const callPostSaveAPI = () => {
+  const QuestionPostSaveAPI = () => {
     const formData = getValues();
     axios
-      .post(`${BASE_PATH}/${POST_PATH}`, formData)
+      .post(`${BASE_PATH}/${POST_PATH}/question`, formData)
       .then((res) => {
         if (res) {
           console.log(res);
@@ -103,7 +103,7 @@ export default function Board() {
   };
 
   const savePostForm = (
-    <form onSubmit={handleSubmit(callPostSaveAPI)}>
+    <form onSubmit={handleSubmit(QuestionPostSaveAPI)}>
       <Box sx={{ my: 2 }}>
         <TextField
           id="post-title"
@@ -140,7 +140,7 @@ export default function Board() {
         variant="h2"
         style={{ fontWeight: 600, color: "#AF8666" }}
       >
-        Board
+        Question
       </Typography>
       {write ? (
         <Box>{savePostForm}</Box>
@@ -214,7 +214,7 @@ export default function Board() {
                         {post.id}
                       </TableCell>
                       <TableCell align="center">
-                        <Link href={`/board/${post.id}`}>
+                        <Link href={`/question/${post.id}`}>
                           <a>{post.title}</a>
                         </Link>
                       </TableCell>

@@ -19,7 +19,8 @@ interface Props {
 }
 
 const items = [
-  { text: "게시판", link: "/board" },
+  { text: "공지사항", link: "/announcement" },
+  { text: "질문 게시판", link: "/question" },
   { text: "알림", link: "/notice" },
   { text: "관리자 페이지", link: "/admin" },
 ];

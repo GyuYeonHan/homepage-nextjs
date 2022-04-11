@@ -70,7 +70,7 @@ export default function Post({ postId }: { postId: string }) {
         if (res) {
           console.log(res);
         }
-        router.push("/board");
+        router.push("/announcement");
       })
       .catch((error) => console.log(error));
   };
@@ -153,7 +153,7 @@ export default function Post({ postId }: { postId: string }) {
         variant="h2"
         style={{ fontWeight: 600, color: "#AF8666" }}
       >
-        Board
+        Announcement
       </Typography>
       {edit ? (
         <Box>{editPostForm}</Box>
@@ -178,7 +178,7 @@ export default function Post({ postId }: { postId: string }) {
               <Button
                 startIcon={<ListIcon />}
                 onClick={() => {
-                  router.push(`/board`);
+                  router.push(`/announcement`);
                 }}
               >
                 목록
